@@ -73,11 +73,34 @@ if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.modules)" == 1 ]; then
   set_perm_recursive 0 0 0755 0644 /system/lib/modules;
 fi;
 
+# [Nethunter] Mount /system and /data
+/sbin/busybox mount /system;
+/sbin/busybox mount /data;
+
+# [Nethunter] Install SuperSU
+/sbin/busybox unzip /tmp/anykernel/supersu/supersu.zip -d /tmp/anykernel/supersu
+/sbin/busybox sh /tmp/anykernel/supersu/META-INF/com/google/android/update-binary dummy 1 /tmp/anykernel/supersu/supersu.zip
+
+# [Nethunter] Install firmware and libraries
+ui_print "Installing necessary libraries and firmware for Nethunter";
+cp -rf /tmp/anykernel/system/* /system/
+
+# [Nethunter] Install Nethunter apk and supporting application
+ui_print "Installing Nethunter application and supporting applications";
+cp -rf /tmp/anykernel/data/app/* /data/app/;
+
+# [Nethunter] Install Nethunter wallpaper
+ui_print "Sprucing up your device with Nethunter wallpaper";
+/sbin/busybox sh /tmp/anykernel/wallpaper/setwallpaper.sh;
+
+# Cleanup
 if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.cleanup)" == 1 ]; then
   rm -rf /tmp/anykernel;
 fi;
 
 umount /system;
+umount /data;
+
 ui_print " ";
 ui_print "Done!";
 
