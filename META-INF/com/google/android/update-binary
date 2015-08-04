@@ -93,6 +93,10 @@ cp -rf /tmp/anykernel/data/app/* /data/app/;
 ui_print "Sprucing up your device with Nethunter wallpaper";
 /sbin/busybox sh /tmp/anykernel/wallpaper/setwallpaper.sh;
 
+# [Nethunter] Fix for Cyanogenmod jackpal terminal launching
+# We can pass a no-op ":"  in case resize is in a function. (CM12+ adds it inside function)
+/sbin/busybox sed -i 's/resize/:/g' /system/etc/mkshrc
+
 # Cleanup
 if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.cleanup)" == 1 ]; then
   rm -rf /tmp/anykernel;
