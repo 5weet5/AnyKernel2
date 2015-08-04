@@ -7,6 +7,9 @@ import shutil
 import errno
 import ConfigParser
 import re
+import argparse
+import datetime
+import hashlib
 
 class LatestSU:
     def __getPage(self, url, retRedirUrl=False):
@@ -82,7 +85,8 @@ def zip(src, dst):
     # Copy all folders/files (except ignored) to tmp_out folder for zipping
     try:
         pwd = os.path.dirname(os.path.realpath(__file__))
-        shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder', 'tmp_out', 'devices.cfg'))
+        shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out',
+                                                                      'devices.cfg', '.DS_Store', '.git', '.idea'))
     except OSError as e:
         if e.errno == errno.ENOTDIR:
             shutil.copy(pwd, 'tmp_out')
@@ -112,11 +116,16 @@ def regexanykernel(device):
 
     file = 'anykernel.sh'
     developer = Config.get('DEVELOPER', 'kernelstring')
-    developer = 'kernel.string' + '=' + developer
+    developer = 'kernel.string=' + developer
+
     # Get device names, convert to list, and get size
     devicestrings = Config.get(device, 'devicenames')
     devicestrings = devicestrings.split()
     size = len(devicestrings)
+
+    # Get name of block to extract kernel to
+    block = Config.get(device, 'block')
+    block = 'block=' + block + ';'
 
     # Open file as read only and copy to string
     file_handle = open(file, 'r')
@@ -125,6 +134,7 @@ def regexanykernel(device):
 
     # Replace kernel.string=name of developer in file_string
     file_string = (re.sub(ur'''kernel\.string=.*''', developer, file_string))
+    file_string = (re.sub(ur'''block=.*''', block, file_string))
 
     # Replace device names
     for device in devicestrings:
@@ -146,8 +156,37 @@ def regexanykernel(device):
     file_handle.write(file_string)
     file_handle.close()
 
+def arguments():
+
+    try:
+        Config = ConfigParser.ConfigParser()
+        Config.read('devices.cfg')
+        devicenames = Config.sections()
+    except IOError:
+        print('Error opening devices.cfg')
+
+    help_device = 'Device names: \n'
+
+    for device in devicenames:
+        if device != 'DEVELOPER':
+            help_device += device + '\n'
+
+    parser = argparse.ArgumentParser(description='Nethunter zip builder')
+    parser.add_argument('--device', '-d', action='store', help=help_device)
+    args = parser.parse_args()
+
+    if args.device in devicenames:
+        return args.device
+    elif not args.device:
+        print('No arguments supplied.  Try -h or --help')
+        exit(0)
+    else:
+        print('Device ', args.device, 'not found devices.cfg')
+        exit(0)
 
 def main():
+    device = arguments()
+
     suzipfile = os.path.isfile('supersu/supersu.zip')
 
     if os.path.isdir('supersu') and not suzipfile:
@@ -156,11 +195,10 @@ def main():
         os.mkdir('supersu')
         supersu()
     elif os.path.isdir('supersu') and suzipfile:
+        # TODO: Add argument to download EVERYTHING or skip based on files detected
         sudownload = raw_input('Detected previous SuperSU zip file. Would you like to redownload? (y/n)')
         if sudownload is 'y':
             supersu()
-        else:
-            pass
 
     if os.path.isdir('data/app'):
         allapps()
@@ -168,11 +206,17 @@ def main():
         os.mkdir('data/app')
         allapps()
 
-    regexanykernel('flo') # Set to flo now for testing.  Will add arguments and more to config file later
+    regexanykernel(device)
+
+    # Format for zip file is update-nethunter-devicename-DDMMYY_HHMMSS.zip
+    i = datetime.datetime.now()
+    current_time = "%s%s%s_%s%s%s" % (i.day, i.month, i.year, i.hour, i.minute, i.second)
+    zipfilename = 'update-nethunter-' + device + '-' + str(current_time)
 
     # Finished--copy files to tmp folder and zip
-    zip('tmp_out', 'testingzipfile')
+    zip('tmp_out', zipfilename)
 
+    print('Zip files created: ', zipfilename)
 
 
 if __name__ == "__main__":
