@@ -63,7 +63,7 @@ def allapps():
             apkname = 'data/app/' + key + '.apk'
 
             if not os.path.isfile(apkname): # Check for existing apk download
-                print('Downloading' + value + 'to' + apkname)
+                print('Downloading ' + value + 'to' + apkname)
                 urllib.urlretrieve (value, apkname)
         print('Finished downloading all apps')
 
@@ -95,7 +95,7 @@ def zip(src, dst, status):
                                                                       'devices.cfg', '.DS_Store', '.git', '.idea',
                                                                       'wallpaper', 'tools', 'supersu', 'modules',
                                                                       'ramdisk', 'patch', 'anykernel', 'anykernel.sh',
-                                                                      'zImage*', 'aroma', 'system'))
+                                                                      'zImage*', 'aroma-update', 'system'))
 
     except OSError as e:
         if e.errno == errno.ENOTDIR:
@@ -240,7 +240,8 @@ def main():
     dir = 'META-INF/com/google/android/'
     if os.path.exists(dir):
         shutil.rmtree(dir)
-    shutil.copytree('aroma', dir)
+
+    shutil.copytree('aroma-update', dir)
 
     # Format for zip file is update-nethunter-devicename-DDMMYY_HHMMSS.zip
     i = datetime.datetime.now()
