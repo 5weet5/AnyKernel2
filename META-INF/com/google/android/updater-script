@@ -1,1 +1,147 @@
-# Dummy file; update-binary is a shell script.
+!/sbin/sh
+# AnyKernel2 Backend
+# osm0sis @ xda-developers
+
+OUTFD=/proc/self/fd/$2;
+ZIP="$3";
+DIR=`dirname "$ZIP"`;
+
+ui_print() {
+  until [ ! "$1" ]; do
+    echo -e "ui_print $1\nui_print" > $OUTFD;
+    shift;
+  done;
+}
+show_progress() { echo "progress $1 $2" > $OUTFD; }
+set_perm_recursive() {
+  dirs=$(echo $* | awk '{ print substr($0, index($0,$5)) }');
+  for i in $dirs; do
+    chown -R $1.$2 $i; chown -R $1:$2 $i;
+    find "$i" -type d -exec chmod $3 {} +;
+    find "$i" -type f -exec chmod $4 {} +;
+  done;
+}
+file_getprop() { grep "^$2" "$1" | cut -d= -f2; }
+getprop() { test -e /sbin/getprop && /sbin/getprop $1 || file_getprop /default.prop $1; }
+abort() { ui_print "$*"; exit 1; }
+
+show_progress 1.34 4;
+ui_print " ";
+mkdir -p /tmp/anykernel;
+cd /tmp/anykernel;
+unzip -o "$ZIP";
+
+ui_print "$(file_getprop /tmp/anykernel/anykernel.sh kernel.string)";
+ui_print " ";
+ui_print "AnyKernel2 by osm0sis @ xda-developers";
+ui_print " ";
+/sbin/busybox mount /system;
+
+if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.devicecheck)" == 1 ]; then
+  ui_print "Checking device...";
+  ui_print " ";
+  for i in 1 2 3 4 5; do
+    testname="$(file_getprop /tmp/anykernel/anykernel.sh device.name$i)";
+    if [ "$(getprop ro.product.device)" == "$testname" -o "$(getprop ro.build.product)" == "$testname" ]; then
+      match=1;
+    fi;
+  done;
+  if [ "$match" != 1 ]; then
+    umount /system;
+    abort "Unsupported device. Aborting...";
+  fi;
+fi;
+
+if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.initd)" == 1 ]; then
+  ui_print "Creating init.d...";
+  ui_print " ";
+  mkdir /system/etc/init.d;
+  set_perm_recursive 0 0 0755 0755 /system/etc/init.d;
+fi;
+
+ui_print "Installing kernel...";
+/sbin/sh /tmp/anykernel/anykernel.sh;
+if [ "$(cat /tmp/anykernel/exitcode)" == 1 ]; then 
+  umount /system;
+  abort;
+fi;
+
+if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.modules)" == 1 ]; then
+  ui_print "Pushing modules...";
+  ui_print " ";
+  cp -f /tmp/anykernel/modules/* /system/lib/modules/;
+  set_perm_recursive 0 0 0755 0644 /system/lib/modules;
+fi;
+
+# [Nethunter] Mount /system and /data
+/sbin/busybox mount /system;
+/sbin/busybox mount /data;
+
+# [Nethunter] Install SuperSU
+#/sbin/busybox unzip /tmp/anykernel/supersu/supersu.zip -d /tmp/anykernel/supersu
+#/sbin/busybox sh /tmp/anykernel/supersu/META-INF/com/google/android/update-binary dummy 1 /tmp/anykernel/supersu/supersu.zip
+
+# [Nethunter] Install firmware and libraries
+ui_print "Installing necessary libraries and firmware for Nethunter";
+cp -rf /tmp/anykernel/system/* /system/
+
+# [Nethunter] Install Nethunter apk and supporting application
+#ui_print "Installing Nethunter application and supporting applications";
+#cp -rf /tmp/anykernel/data/app/* /data/app/;
+
+# [Nethunter] Custom install apps
+ui_print("@Installing Apps")
+if (file_getprop("/tmp/aroma/app_choices.prop", "item.1.1")=="1") then ui_print("Installing Terminal Emulator")
+package_extract_file("data/app/Term.apk", "/data/app")
+endif
+if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.1")=="1") then ui_print("Installing BlueNMEA-2.1.3")
+package_extract_file("data/app/BlueNMEA-2.1.3.apk", "/data/app")
+endif
+if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.2")=="1") then ui_print("Installing Drivedroid-0.9.19")
+package_extract_file("data/app/Drivedroid-0.9.19.apk", "/data/app")
+endif
+if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.3")=="1") then ui_print("Installing Hackerskeyboard-1.0.3.7")
+package_extract_file("data/app/Hackerskeyboard-1.0.3.7.apk", "/data/app")
+endif
+if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.4")=="1") then ui_print("Installing RFAnalyzer")
+package_extract_file("data/app/RFAnalyzer.apk", "/data/app")
+endif
+if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.5")=="1") then ui_print("Installing Shodan")
+package_extract_file("data/app/Shodan.apk", "/data/app")
+endif
+if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.6")=="1") then ui_print("Installing USBKeyboard")
+package_extract_file("data/app/USBKeyboard.apk", "/data/app")
+endif
+if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.7")=="1") then ui_print("Installing VNC-20110327")
+package_extract_file("data/app/VNC-20110327.apk", "/data/app")
+endif
+
+# [Nethunter] Install SuperSU
+/sbin/busybox unzip /tmp/anykernel/supersu/supersu.zip -d /tmp/anykernel/supersu
+/sbin/busybox sh /tmp/anykernel/supersu/META-INF/com/google/android/update-binary dummy 1 /tmp/anykernel/supersu/supersu.zip  
+endif;
+
+# [Nethunter] Install Nethunter wallpaper
+ui_print "Sprucing up your device with Nethunter wallpaper";
+/sbin/busybox sh /tmp/anykernel/wallpaper/setwallpaper.sh;
+
+# [Nethunter] Fix for Cyanogenmod jackpal terminal launching
+# We can pass a no-op ":"  in case resize is in a function. (CM12+ adds it inside function)
+/sbin/busybox sed -i 's/resize/:/g' /system/etc/mkshrc
+
+# Cleanup
+if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.cleanup)" == 1 ]; then
+  rm -rf /tmp/anykernel;
+fi;
+
+set_perm_recursive(1000, 1000, 0771, 0644, "/data/app");
+set_perm_recursive(1000, 1000, 0775, 0644, "/system/app");
+ui_print("@Wiping dalvik-cache");
+delete_recursive("/data/dalvik-cache");
+set_progress(0.9);
+umount /system;
+umount /data;
+
+ui_print " ";
+ui_print "Done!";
+set_progress(1);
