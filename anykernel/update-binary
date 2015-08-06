@@ -78,48 +78,12 @@ fi;
 /sbin/busybox mount /data;
 
 # [Nethunter] Install SuperSU
-#/sbin/busybox unzip /tmp/anykernel/supersu/supersu.zip -d /tmp/anykernel/supersu
-#/sbin/busybox sh /tmp/anykernel/supersu/META-INF/com/google/android/update-binary dummy 1 /tmp/anykernel/supersu/supersu.zip
+/sbin/busybox unzip /tmp/anykernel/supersu/supersu.zip -d /tmp/anykernel/supersu
+/sbin/busybox sh /tmp/anykernel/supersu/META-INF/com/google/android/update-binary dummy 1 /tmp/anykernel/supersu/supersu.zip
 
 # [Nethunter] Install firmware and libraries
 ui_print "Installing necessary libraries and firmware for Nethunter";
 cp -rf /tmp/anykernel/system/* /system/
-
-# [Nethunter] Install Nethunter apk and supporting application
-#ui_print "Installing Nethunter application and supporting applications";
-#cp -rf /tmp/anykernel/data/app/* /data/app/;
-
-# [Nethunter] Custom install apps
-ui_print("@Installing Apps")
-if (file_getprop("/tmp/aroma/app_choices.prop", "item.1.1")=="1") then ui_print("Installing Terminal Emulator")
-package_extract_file("data/app/Term.apk", "/data/app")
-endif
-if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.1")=="1") then ui_print("Installing BlueNMEA-2.1.3")
-package_extract_file("data/app/BlueNMEA-2.1.3.apk", "/data/app")
-endif
-if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.2")=="1") then ui_print("Installing Drivedroid-0.9.19")
-package_extract_file("data/app/Drivedroid-0.9.19.apk", "/data/app")
-endif
-if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.3")=="1") then ui_print("Installing Hackerskeyboard-1.0.3.7")
-package_extract_file("data/app/Hackerskeyboard-1.0.3.7.apk", "/data/app")
-endif
-if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.4")=="1") then ui_print("Installing RFAnalyzer")
-package_extract_file("data/app/RFAnalyzer.apk", "/data/app")
-endif
-if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.5")=="1") then ui_print("Installing Shodan")
-package_extract_file("data/app/Shodan.apk", "/data/app")
-endif
-if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.6")=="1") then ui_print("Installing USBKeyboard")
-package_extract_file("data/app/USBKeyboard.apk", "/data/app")
-endif
-if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.7")=="1") then ui_print("Installing VNC-20110327")
-package_extract_file("data/app/VNC-20110327.apk", "/data/app")
-endif
-
-# [Nethunter] Install SuperSU
-/sbin/busybox unzip /tmp/anykernel/supersu/supersu.zip -d /tmp/anykernel/supersu
-/sbin/busybox sh /tmp/anykernel/supersu/META-INF/com/google/android/update-binary dummy 1 /tmp/anykernel/supersu/supersu.zip  
-endif;
 
 # [Nethunter] Install Nethunter wallpaper
 ui_print "Sprucing up your device with Nethunter wallpaper";

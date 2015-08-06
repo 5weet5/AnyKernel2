@@ -82,12 +82,21 @@ def ignore_function(ignore):
 
 # Modified source from: http://stackoverflow.com/questions/14568647/create-zip-in-python
 # and http://www.pythoncentral.io/how-to-recursively-copy-a-directory-folder-in-python/
-def zip(src, dst):
+def zip(src, dst, status):
     # Copy all folders/files (except ignored) to tmp_out folder for zipping
     try:
         pwd = os.path.dirname(os.path.realpath(__file__))
-        shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out',
-                                                                      'devices.cfg', '.DS_Store', '.git', '.idea'))
+        if status == "anykernel":
+            shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out',
+                                                                      'devices.cfg', '.DS_Store', '.git', '.idea',
+                                                                      'aroma', 'data', 'anykernel'))
+        elif status == "aroma":
+            shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out',
+                                                                      'devices.cfg', '.DS_Store', '.git', '.idea',
+                                                                      'wallpaper', 'tools', 'supersu', 'modules',
+                                                                      'ramdisk', 'patch', 'anykernel', 'anykernel.sh',
+                                                                      'zImage*', 'aroma', 'system'))
+
     except OSError as e:
         if e.errno == errno.ENOTDIR:
             shutil.copy(pwd, 'tmp_out')
@@ -186,8 +195,11 @@ def arguments():
         exit(0)
 
 def main():
+    ######### Start Anykernel2 installer #############
     device = arguments()
+    regexanykernel(device)
 
+    # Grab latestest SuperSU
     suzipfile = os.path.isfile('supersu/supersu.zip')
 
     if os.path.isdir('supersu') and not suzipfile:
@@ -201,24 +213,45 @@ def main():
         if sudownload is 'y':
             supersu()
 
+    # Copy anykernel update-binary to android folder for installation
+    dir = 'META-INF/com/google/android/'
+    if os.path.exists(dir):
+        shutil.rmtree(dir)
+    shutil.copytree('anykernel', dir)
+
+    zipfilename = 'anykernel2'
+
+    # Finished--copy files to tmp folder and zip
+    zip('tmp_out', zipfilename, 'anykernel')
+    if os.path.exists('anykernelzip'):
+        shutil.rmtree('anykernelzip')
+    os.makedirs('anykernelzip')
+    shutil.move('anykernel2.zip', 'anykernelzip/anykernel2.zip')
+
+    ####### End AnyKernel2 installer ############
+    #
+    ####### Start building aroma installer ######
     if os.path.isdir('data/app'):
         allapps()
     elif not os.path.isdir('data/app'):
         os.mkdir('data/app')
         allapps()
 
-    regexanykernel(device)
+    dir = 'META-INF/com/google/android/'
+    if os.path.exists(dir):
+        shutil.rmtree(dir)
+    shutil.copytree('aroma', dir)
 
     # Format for zip file is update-nethunter-devicename-DDMMYY_HHMMSS.zip
     i = datetime.datetime.now()
     current_time = "%s%s%s_%s%s%s" % (i.day, i.month, i.year, i.hour, i.minute, i.second)
     zipfilename = 'update-nethunter-' + device + '-' + str(current_time)
+    
+    zip('tmp_out', zipfilename, 'aroma')
 
-    # Finished--copy files to tmp folder and zip
-    zip('tmp_out', zipfilename)
-
-    print('Zip files created: ', zipfilename)
-
+    # Clean up
+    if os.path.exists('anykernelzip'):
+        shutil.rmtree('anykernelzip')    
 
 if __name__ == "__main__":
     main()
