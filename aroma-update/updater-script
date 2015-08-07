@@ -1,50 +1,43 @@
-set_progress(0.0);
-ui_print("");
-ui_print("Installing Nethunter");
+ui_print("@Starting the install process");
 
-/sbin/busybox mount /data;
+ui_print("Copying tools to /tmp");
+package_extract_dir("tools", "/tmp");
+set_perm(0, 0, 0755, "/tmp/busybox");
+ui_print("Mounting /data");
+run_program("/tmp/busybox", "mount", "/data");
 
-set_progress(0.1);
-# [Nethunter] Custom install apps
-ui_print("@Installing Apps")
-if (file_getprop("/tmp/aroma/app_choices.prop", "item.1.1")=="1") then ui_print("Installing Terminal Emulator")
-package_extract_file("data/app/Term.apk", "/data/app")
-endif
-if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.1")=="1") then ui_print("Installing BlueNMEA-2.1.3")
-package_extract_file("data/app/BlueNMEA-2.1.3.apk", "/data/app")
-endif
-if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.2")=="1") then ui_print("Installing Drivedroid-0.9.19")
-package_extract_file("data/app/Drivedroid-0.9.19.apk", "/data/app")
-endif
-if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.3")=="1") then ui_print("Installing Hackerskeyboard-1.0.3.7")
-package_extract_file("data/app/Hackerskeyboard-1.0.3.7.apk", "/data/app")
-endif
-if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.4")=="1") then ui_print("Installing RFAnalyzer")
-package_extract_file("data/app/RFAnalyzer.apk", "/data/app")
-endif
-if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.5")=="1") then ui_print("Installing Shodan")
-package_extract_file("data/app/Shodan.apk", "/data/app")
-endif
-if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.6")=="1") then ui_print("Installing USBKeyboard")
-package_extract_file("data/app/USBKeyboard.apk", "/data/app")
-endif
-if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.7")=="1") then ui_print("Installing VNC-20110327")
-package_extract_file("data/app/VNC-20110327.apk", "/data/app")
-endif
-
-# Install anykernel
-package_extract_dir("anykernelzip", "/tmp/anykernelzip");
-/sbin/busybox unzip /tmp/anykernelzip/anykernel2.zip -d /tmp/anykernelzip/anykernelzip
-/sbin/busybox sh /tmp/anykernelzip/anykernelzip/META-INF/com/google/android/update-binary dummy 1 /tmp/anykernel/anykernel/anykernel2.zip
-
+ui_print("@Installing Apps");
+if (file_getprop("/tmp/aroma/app_choices.prop", "item.1.1")=="1") then ui_print("Installing Term");
+package_extract_file("data/app/Term.apk", "/data/app/Term.apk");
+endif;
+if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.1")=="1") then ui_print("Installing BlueNMEA-2.1.3");
+package_extract_file("data/app/BlueNMEA-2.1.3.apk", "/data/app/BlueNMEA-2.1.3.apk");
+endif;
+if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.2")=="1") then ui_print("Installing Drivedroid-0.9.19");
+package_extract_file("data/app/Drivedroid-0.9.19.apk", "/data/app/Drivedroid-0.9.19.apk");
+endif;
+if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.3")=="1") then ui_print("Installing Hackerskeyboard-1.0.3.7");
+package_extract_file("data/app/Hackerskeyboard-1.0.3.7.apk", "/data/app/Hackerskeyboard-1.0.3.7.apk");
+endif;
+if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.4")=="1") then ui_print("Installing RFAnalyzer");
+package_extract_file("data/app/RFAnalyzer.apk", "/data/app/RFAnalyzer.apk");
+endif;
+if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.5")=="1") then ui_print("Installing Shodan");
+package_extract_file("data/app/Shodan.apk", "/data/app/Shodan.apk");
+endif;
+if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.6")=="1") then ui_print("Installing USBKeyboard");
+package_extract_file("data/app/USBKeyboard.apk", "/data/app/USBKeyboard.apk");
+endif;
+if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.7")=="1") then ui_print("Installing VNC-20110327");
+package_extract_file("data/app/VNC-20110327.apk", "/data/app/VNC-20110327.apk");
+endif;
 set_perm_recursive(1000, 1000, 0771, 0644, "/data/app");
-set_perm_recursive(1000, 1000, 0775, 0644, "/system/app");
-ui_print("@Wiping dalvik-cache");
-delete_recursive("/data/dalvik-cache");
-set_progress(0.9);
-umount /system;
-umount /data;
+unmount("/data");
 
-ui_print " ";
-ui_print "Done!";
+ui_print("@Installing Kernel");
+package_extract_dir("anykernelzip", "/tmp/anykerneltmp");
+run_program("/tmp/busybox", "unzip", "/tmp/anykerneltmp/anykernel2.zip", "-d", "/tmp/anykerneltmp");
+run_program("/tmp/busybox", "sh", "/tmp/anykerneltmp/META-INF/com/google/android/update-binary", "dummy", "1", "/tmp/anykerneltmp/anykernel2.zip");
+
+ui_print("@Finished Install");
 set_progress(1);

@@ -3,6 +3,7 @@
 # Copyright (C) 2011 Ahmad Amarullah ( http://amarullz.com/ )
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
+
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
@@ -24,41 +25,21 @@
 #       Binary Version  : 3.00
 #       Binary Codename : Flamboyan
 #
-### INFO:
-#
-# * AROMA Resource Dir  = META-INF/com/google/android/aroma
-#
-# * AROMA Temporary Dir = /tmp/aroma/
-#
-# * About Icon          = @alert - show <AROMA Resource Dir>/icons/alert.png
-#                         or if theme used it will find <themedir>/icon.alert.png
-#                         you can still access it via "icons/alert"
-#
-# * dp                  = Device Pixelate. WVGA/QHD = 3, HVGA = 2.
-#                         dp calculated with = round(min(width,height) / 160)
-#
-###
+
 ini_set("force_colorspace","rgba");
-##
-# Initializing Rom Information
-#
+
 ini_set("rom_name",             "Kali Nethunter Kernel");
 ini_set("rom_version",          "2.00");
 ini_set("rom_author",           "Binkybear");
 ini_set("rom_device",           "ANY");
 ini_set("rom_date",             "2015");
 
-##
-# Show Simple Splash
-#
-splash(3000, "nethunter");
+splash(3000, "SPLASH");
 
-#
-# Set Small Font to Support all fonts
-#
-fontresload( "0", "ttf/Roboto-Regular.ttf;ttf/DroidSansFallback.ttf;", "12" );
-fontresload( "1", "ttf/Roboto-Regular.ttf;ttf/DroidSansFallback.ttf;", "14" );
+fontresload("0", "ttf/Roboto-Regular.ttf", "12");
+fontresload("1", "ttf/Roboto-Regular.ttf", "18");
 
+theme("miui4");
 
 viewbox(
     "Welcome",
@@ -73,6 +54,8 @@ viewbox(
     "@welcome"
 );
 
+# CUSTOM APP INSTALLER #
+
 checkbox("App List","Choose the apps to be installed to data","@personalize","app_choices.prop",
 "Required", "", 2,
 "Term", "", 0,
@@ -85,8 +68,17 @@ checkbox("App List","Choose the apps to be installed to data","@personalize","ap
 "USBKeyboard", "", 0,
 "VNC-20110327", "", 0);
 setvar("installer_title","You are about to install the following apps:");
-appendvar("installer_title","\n\n");appendvar("installer_title",iif(prop("app_choices.prop","item.1.1")=="1","Term ",""));appendvar("installer_title",iif(prop("app_choices.prop","item.2.1")=="1","BlueNMEA-2.1.3 ",""));appendvar("installer_title",iif(prop("app_choices.prop","item.2.2")=="1","Drivedroid-0.9.19 ",""));appendvar("installer_title",iif(prop("app_choices.prop","item.2.3")=="1","Hackerskeyboard-1.0.3.7 ",""));appendvar("installer_title",iif(prop("app_choices.prop","item.2.4")=="1","RFAnalyzer ",""));appendvar("installer_title",iif(prop("app_choices.prop","item.2.5")=="1","Shodan ",""));appendvar("installer_title",iif(prop("app_choices.prop","item.2.6")=="1","USBKeyboard ",""));appendvar("installer_title",iif(prop("app_choices.prop","item.2.7")=="1","VNC-20110327 ",""));
+appendvar("installer_title","\n\n");
+appendvar("installer_title",iif(prop("app_choices.prop","item.1.1")=="1","Term ",""));
+appendvar("installer_title",iif(prop("app_choices.prop","item.2.1")=="1","BlueNMEA-2.1.3 ",""));
+appendvar("installer_title",iif(prop("app_choices.prop","item.2.2")=="1","Drivedroid-0.9.19 ",""));
+appendvar("installer_title",iif(prop("app_choices.prop","item.2.3")=="1","Hackerskeyboard-1.0.3.7 ",""));
+appendvar("installer_title",iif(prop("app_choices.prop","item.2.4")=="1","RFAnalyzer ",""));
+appendvar("installer_title",iif(prop("app_choices.prop","item.2.5")=="1","Shodan ",""));
+appendvar("installer_title",iif(prop("app_choices.prop","item.2.6")=="1","USBKeyboard ",""));
+appendvar("installer_title",iif(prop("app_choices.prop","item.2.7")=="1","VNC-20110327 ",""));
 writetmpfile("app_choices.prop",readtmpfile("app_choices.prop"));
 writetmpfile("system_app_choices.prop",readtmpfile("system_app_choices.prop"));
-if confirm("Installing",getvar("installer_title") + "\n\nStart installation?", "@confirm")=="no" then back(1); endif;
+if confirm("Installing",getvar("installer_title") + "\n\nStart installation?", "@confirm")=="no" then back(1);
+ endif;
 install("Installing", "Your selected apps are being installed. Please Wait...", "@install");
