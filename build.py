@@ -88,12 +88,12 @@ def zip(src, dst, status):
 		if status == "anykernel":
 			shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out',
 																	  'devices.cfg', '.DS_Store', '.git', '.idea',
-																	  'aroma', 'data', 'system', 'anykernel',
+																	  'aroma', 'data', 'system', 'anykernel', 'wallpaper'
 																	  'supersu', 'update-nethunter*'))
 		elif status == "aroma":
 			shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out',
 																	  'devices.cfg', '.DS_Store', '.git', '.idea',
-																	  'wallpaper', 'modules', 'anykernel.sh',
+																	  'modules', 'anykernel.sh',
 																	  'ramdisk', 'patch', 'anykernel',
 																	  'zImage*', 'aroma-update', 'update-nethunter*'))
 

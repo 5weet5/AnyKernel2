@@ -25,21 +25,18 @@ file_getprop() { grep "^$2" "$1" | cut -d= -f2; }
 getprop() { test -e /sbin/getprop && /sbin/getprop $1 || file_getprop /default.prop $1; }
 abort() { ui_print "$*"; exit 1; }
 
-show_progress 1.34 4;
-ui_print " ";
 mkdir -p /tmp/nethunterkernel;
 cd /tmp/nethunterkernel;
 unzip -o "$ZIP";
 
+ui_print "**********************";
 ui_print "$(file_getprop /tmp/nethunterkernel/anykernel.sh kernel.string)";
-ui_print " ";
-ui_print "AnyKernel2 by osm0sis @ xda-developers";
-ui_print " ";
+ui_print " AnyKernel2 by osm0sis @ xda-developers";
+ui_print "**********************";
 /tmp/busybox mount /system;
 
 if [ "$(file_getprop /tmp/nethunterkernel/anykernel.sh do.devicecheck)" == 1 ]; then
-  ui_print "Checking device...";
-  ui_print " ";
+  ui_print "- Checking device...";
   for i in 1 2 3 4 5; do
     testname="$(file_getprop /tmp/nethunterkernel/anykernel.sh device.name$i)";
     if [ "$(getprop ro.product.device)" == "$testname" -o "$(getprop ro.build.product)" == "$testname" ]; then
@@ -48,18 +45,17 @@ if [ "$(file_getprop /tmp/nethunterkernel/anykernel.sh do.devicecheck)" == 1 ]; 
   done;
   if [ "$match" != 1 ]; then
     umount /system;
-    abort "Unsupported device. Aborting...";
+    abort "- Unsupported device. Aborting...";
   fi;
 fi;
 
 if [ "$(file_getprop /tmp/nethunterkernel/anykernel.sh do.initd)" == 1 ]; then
-  ui_print "Creating init.d...";
-  ui_print " ";
+  ui_print "- Creating init.d...";
   mkdir /system/etc/init.d;
   set_perm_recursive 0 0 0755 0755 /system/etc/init.d;
 fi;
 
-ui_print "Installing kernel...";
+ui_print "- Starting kernel installation...";
 /sbin/sh /tmp/nethunterkernel/anykernel.sh;
 if [ "$(cat /tmp/nethunterkernel/exitcode)" == 1 ]; then 
   umount /system;
@@ -67,19 +63,10 @@ if [ "$(cat /tmp/nethunterkernel/exitcode)" == 1 ]; then
 fi;
 
 if [ "$(file_getprop /tmp/nethunterkernel/anykernel.sh do.modules)" == 1 ]; then
-  ui_print "Pushing modules...";
-  ui_print " ";
+  ui_print "- Pushing modules...";
   cp -f /tmp/nethunterkernel/modules/* /system/lib/modules/;
   set_perm_recursive 0 0 0755 0644 /system/lib/modules;
 fi;
-
-# [Nethunter] Install firmware and libraries
-ui_print "Installing necessary libraries and firmware for Nethunter";
-cp -rf /tmp/nethunterkernel/system/* /system/
-
-# [Nethunter] Install Nethunter wallpaper
-ui_print "Sprucing up your device with Nethunter wallpaper";
-/tmp/busybox sh /tmp/nethunterkernel/wallpaper/setwallpaper.sh;
 
 # [Nethunter] Fix for Cyanogenmod jackpal terminal launching
 # We can pass a no-op ":"  in case resize is in a function. (CM12+ adds it inside function)
@@ -87,10 +74,10 @@ ui_print "Sprucing up your device with Nethunter wallpaper";
 
 # Cleanup
 if [ "$(file_getprop /tmp/nethunterkernel/anykernel.sh do.cleanup)" == 1 ]; then
-  rm -rf /tmp/nethunterkernel;
+  rm -rf /tmp/nethunterkernel
   rm -rf /tmp/anykernel
+  rm -rf /tmp/supersu
+  rm -rf /tmp/busybox /tmp/mkbootimg /tmp/unpackbootimg
 fi;
 
-ui_print " ";
-ui_print "Done!";
-set_progress(1);
+ui_print "- Kernel installation completed";

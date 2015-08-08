@@ -1,13 +1,16 @@
+set_progress(0.0);
 ui_print("@Starting the install process");
-
+set_progress(0.1);
 ui_print("Copying tools to /tmp");
 package_extract_dir("tools", "/tmp");
 set_perm(0, 0, 0755, "/tmp/busybox");
+set_progress(0.3);
 ui_print("Mounting /data");
 run_program("/tmp/busybox", "mount", "/data");
 ui_print("Mounting /system");
 run_program("/tmp/busybox", "mount", "/system");
 
+set_progress(0.5);
 ui_print("@Installing Apps");
 if (file_getprop("/tmp/aroma/app_choices.prop", "item.1.1")=="1") then ui_print("Installing Jackpal Terminal");
 package_extract_file("data/app/Term.apk", "/data/app/Term.apk");
@@ -39,12 +42,35 @@ if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.7")=="1") then ui_print(
 package_extract_file("data/app/VNC-20110327.apk", "/data/app/VNC-20110327.apk");
 endif;
 
+if
+   file_getprop("/tmp/aroma/mods.prop","item.0.1") == "1"
+     then
+   ui_print("@Installing wireless firmware");
+   package_extract_dir("system/etc/firmware", "/system/etc/firmware");
+endif;
+if
+   file_getprop("/tmp/aroma/mods.prop","item.0.2") == "1"
+     then
+   ui_print("@Installing nano binary");
+   package_extract_dir("system/etc/nano", "/system/etc/nano");
+   package_extract_dir("system/etc/terminfo", "/system/etc/terminfo");
+   package_extract_dir("system/lib", "/system/etc/lib");
+endif;
+if
+   file_getprop("/tmp/aroma/mods.prop","item.0.3") == "1"
+     then
+   ui_print("@Installing Nethunter wallpapers");
+   run_program("/tmp/busybox", "sh", "wallpaper/setwallpaper.sh");
+endif;
+
+set_progress(0.8);
 ui_print("@Installing Kernel");
 package_extract_dir("anykernelzip", "/tmp/anykernel");
 run_program("/tmp/busybox", "unzip", "-o", "/tmp/anykernel/anykernel2.zip", "-d", "/tmp/anykernel");
 run_program("/tmp/busybox", "sh", "/tmp/anykernel/META-INF/com/google/android/update-binary", "dummy", "1", "/tmp/anykernel/anykernel2.zip");
 set_perm_recursive(1000, 1000, 0771, 0644, "/data/app");
 set_perm_recursive(1000, 1000, 0775, 0644, "/system/app");
+set_progress(0.9);
 unmount("/data");
 unmount("/system");
 ui_print("@Finished Install");
