@@ -45,7 +45,7 @@ endif;
 if
    file_getprop("/tmp/aroma/mods.prop","item.0.1") == "1"
      then
-   ui_print("@Installing wireless firmware");
+   ui_print("@Installing Wireless Firmware");
    package_extract_dir("system/etc/firmware", "/system/etc/firmware");
 endif;
 if
@@ -62,12 +62,22 @@ if
    ui_print("@Installing Nethunter wallpapers");
    run_program("/tmp/busybox", "sh", "wallpaper/setwallpaper.sh");
 endif;
+if
+   file_getprop("/tmp/aroma/mods.prop","item.0.4") == "1"
+     then
+   ui_print("@Freeing some space on /system");
+   run_program("/tmp/busybox", "sh", "/tmp/cleansystem.sh");
+endif;
 
 set_progress(0.8);
-ui_print("@Installing Kernel");
+ui_print("@Installing Kernel using AnyKernel2");
 package_extract_dir("anykernelzip", "/tmp/anykernel");
 run_program("/tmp/busybox", "unzip", "-o", "/tmp/anykernel/anykernel2.zip", "-d", "/tmp/anykernel");
 run_program("/tmp/busybox", "sh", "/tmp/anykernel/META-INF/com/google/android/update-binary", "dummy", "1", "/tmp/anykernel/anykernel2.zip");
+
+# INSTALL NETHUNTER APK
+package_extract_file("data/app/nethunter.apk", "/data/app/nethunter.apk");
+
 set_perm_recursive(1000, 1000, 0771, 0644, "/data/app");
 set_perm_recursive(1000, 1000, 0775, 0644, "/system/app");
 set_progress(0.9);
