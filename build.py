@@ -184,9 +184,13 @@ def main():
 
 	parser = argparse.ArgumentParser(description='Nethunter zip builder')
 	parser.add_argument('--device', '-d', action='store', help=help_device)
-	parser.add_argument('--forcedown', '-f', action='store', help='Force redownloading')
+	parser.add_argument('--forcedown', '-f', action='store_true', help='Force redownloading')
 
 	args = parser.parse_args()
+
+	if args.forcedown:
+		supersu()
+		allapps()	
 
 	if args.device in devicenames:
 		device = args.device	
@@ -206,8 +210,6 @@ def main():
 		supersu()
 	elif not os.path.isdir('supersu') and not suzipfile:
 		os.mkdir('supersu')
-		supersu()
-	elif args.forcedown:
 		supersu()
 
 	# Copy anykernel update-binary to android folder for installation
@@ -231,10 +233,6 @@ def main():
 	if os.path.isdir('data/app'):
 		allapps()
 	elif not os.path.isdir('data/app'):
-		os.mkdir('data/app')
-		allapps()
-	elif args.forcedown:
-		shutil.rmtree('data/app')
 		os.mkdir('data/app')
 		allapps()
 
