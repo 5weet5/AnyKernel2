@@ -58,7 +58,8 @@ viewbox(
 
 checkbox("App List","Choose the apps to be installed to data","@personalize","app_choices.prop",
 "Required", "", 2,
-"Term", "", 0,
+"Terminal Emulator", "", 1,
+"SuperSU", "", 1,
 "Optional", "", 2,
 "BlueNMEA-2.1.3", "", 0,
 "Drivedroid-0.9.19", "", 0,
@@ -69,7 +70,8 @@ checkbox("App List","Choose the apps to be installed to data","@personalize","ap
 "VNC-20110327", "", 0);
 setvar("installer_title","You are about to install the following apps:");
 appendvar("installer_title","\n\n");
-appendvar("installer_title",iif(prop("app_choices.prop","item.1.1")=="1","Term ",""));
+appendvar("installer_title",iif(prop("app_choices.prop","item.1.1")=="1","Terminal Emulator ",""));
+appendvar("installer_title",iif(prop("app_choices.prop","item.1.2")=="1","SuperSU",""));
 appendvar("installer_title",iif(prop("app_choices.prop","item.2.1")=="1","BlueNMEA-2.1.3 ",""));
 appendvar("installer_title",iif(prop("app_choices.prop","item.2.2")=="1","Drivedroid-0.9.19 ",""));
 appendvar("installer_title",iif(prop("app_choices.prop","item.2.3")=="1","Hackerskeyboard-1.0.3.7 ",""));

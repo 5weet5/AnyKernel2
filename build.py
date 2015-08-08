@@ -88,13 +88,14 @@ def zip(src, dst, status):
 		if status == "anykernel":
 			shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out',
 																	  'devices.cfg', '.DS_Store', '.git', '.idea',
-																	  'aroma', 'data', 'anykernel', 'update-nethunter*'))
+																	  'aroma', 'data', 'system', 'anykernel',
+																	  'supersu', 'update-nethunter*'))
 		elif status == "aroma":
 			shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out',
 																	  'devices.cfg', '.DS_Store', '.git', '.idea',
-																	  'wallpaper', 'supersu', 'modules',
-																	  'ramdisk', 'patch', 'anykernel', 'anykernel.sh',
-																	  'zImage*', 'aroma-update', 'system', 'update-nethunter*'))
+																	  'wallpaper', 'modules', 'anykernel.sh',
+																	  'ramdisk', 'patch', 'anykernel',
+																	  'zImage*', 'aroma-update', 'update-nethunter*'))
 
 	except OSError as e:
 		if e.errno == errno.ENOTDIR:
@@ -255,7 +256,7 @@ def main():
 	if os.path.exists('anykernelzip'):
 		shutil.rmtree('anykernelzip')
 
-	print('Created: ', zipfilename)
+	print('Created: ', zipfilename + '.zip')
 
 if __name__ == "__main__":
 	main()
