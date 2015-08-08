@@ -117,6 +117,36 @@ def zip(src, dst, status):
 	except IOError, e:
 		print('Error' + str(e.reason))
 
+def regexaroma(device):
+
+	Config = ConfigParser.ConfigParser()
+	Config.read('devices.cfg')
+
+	file = 'META-INF/com/google/android/aroma-config'
+	author = Config.get('DEVELOPER', 'author')
+	version = Config.get('DEVELOPER', 'version')
+
+	file_handle = open(file, 'r')
+	file_string = file_handle.read()
+	file_handle.close()
+
+	d = datetime.datetime.now()
+	date = "%s/%s/%s" % (d.day, d.month, d.year)
+	
+	author = 'ini_set("rom_author",          "' + str(author) + '");'
+	version = 'ini_set("rom_version",          "' + str(version) + '");'
+	device = 'ini_set("rom_device",          "' + str(device) + '");'
+	date = 'ini_set("rom_date",          "' + str(date) + '");'
+
+	file_string = (re.sub(ur'''ini_set\(\"rom_version\".*''', version, file_string))
+	file_string = (re.sub(ur'''ini_set\(\"rom_author\".*''', author, file_string))
+	file_string = (re.sub(ur'''ini_set\(\"rom_device\".*''', device, file_string))
+	file_string = (re.sub(ur'''ini_set\(\"rom_date\".*''', date, file_string))
+
+	file_handle = open(file, 'w')
+	file_handle.write(file_string)
+	file_handle.close()	
+
 def regexanykernel(device):
 
 	i = 0
@@ -242,6 +272,8 @@ def main():
 		shutil.rmtree(dir)
 
 	shutil.copytree('aroma-update', dir)
+
+	regexaroma(device) # Add version/author to Aroma installer
 
 	# Format for zip file is update-nethunter-devicename-DDMMYY_HHMMSS.zip
 	i = datetime.datetime.now()
