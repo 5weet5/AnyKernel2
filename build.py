@@ -87,13 +87,13 @@ def zip(src, dst, status):
 		pwd = os.path.dirname(os.path.realpath(__file__))
 		if status == "anykernel":
 			shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out',
-																	  'devices.cfg', '.DS_Store', '.git', '.idea',
+																	  'devices.cfg', '.DS_Store', '.git', '.idea', 'aroma-update',
 																	  'aroma', 'data', 'system', 'anykernel', 'wallpaper'
-																	  'supersu', 'update-nethunter*'))
+																	  'supersu', 'supersu', 'wallpaper', '' 'update-nethunter*'))
 		elif status == "aroma":
 			shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out',
 																	  'devices.cfg', '.DS_Store', '.git', '.idea',
-																	  'modules', 'anykernel.sh',
+																	  'modules', 'anykernel.sh', 'dtb',
 																	  'ramdisk', 'patch', 'anykernel',
 																	  'zImage*', 'aroma-update', 'update-nethunter*'))
 
@@ -133,8 +133,8 @@ def regexaroma(device):
 	d = datetime.datetime.now()
 	date = "%s/%s/%s" % (d.day, d.month, d.year)
 	
-	author = 'ini_set("rom_author",          "' + str(author) + '");'
-	version = 'ini_set("rom_version",          "' + str(version) + '");'
+	author = 'ini_set("rom_author",          ' + str(author) + ');'
+	version = 'ini_set("rom_version",          ' + str(version) + ');'
 	device = 'ini_set("rom_device",          "' + str(device) + '");'
 	date = 'ini_set("rom_date",          "' + str(date) + '");'
 
