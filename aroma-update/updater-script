@@ -13,8 +13,8 @@ run_program("/tmp/busybox", "mount", "/system");
 set_progress(0.5);
 ui_print("@Installing Apps");
 if (file_getprop("/tmp/aroma/app_choices.prop", "item.1.1")=="1") then ui_print("Installing Nethunter");
-run_program("/tmp/busybox", "mount", "/data");
-package_extract_file("data/app/nethunter.apk", "/data/app/nethunter.apk");
+run_program("/tmp/busybox", "mount", "/system");
+package_extract_file("system/priv-app/nethunter.apk", "/system/priv-app/nethunter.apk");
 endif;
 if (file_getprop("/tmp/aroma/app_choices.prop", "item.1.2")=="1") then ui_print("Installing Jackpal Terminal");
 run_program("/tmp/busybox", "mount", "/data");
@@ -103,7 +103,9 @@ run_program("/tmp/busybox", "unzip", "-o", "/tmp/anykernel/anykernel2.zip", "-d"
 run_program("/tmp/busybox", "sh", "/tmp/anykernel/META-INF/com/google/android/update-binary", "dummy", "1", "/tmp/anykernel/anykernel2.zip");
 
 run_program("/tmp/busybox", "mount", "/data");
+run_program("/tmp/busybox", "mount", "/system");
 set_perm_recursive(1000, 1000, 0771, 0644, "/data/app");
+set_perm(1000, 1000, 0771, 0644, "/system/priv-app/nethunter.apk");
 set_progress(0.9);
 ui_print("@Wiping dalvik-cache");
 delete_recursive("/data/dalvik-cache");
