@@ -13,9 +13,11 @@ run_program("/tmp/busybox", "mount", "/system");
 set_progress(0.5);
 ui_print("@Installing Apps");
 if (file_getprop("/tmp/aroma/app_choices.prop", "item.1.1")=="1") then ui_print("Installing Nethunter");
+run_program("/tmp/busybox", "mount", "/data");
 package_extract_file("data/app/nethunter.apk", "/data/app/nethunter.apk");
 endif;
 if (file_getprop("/tmp/aroma/app_choices.prop", "item.1.2")=="1") then ui_print("Installing Jackpal Terminal");
+run_program("/tmp/busybox", "mount", "/data");
 package_extract_file("data/app/Term.apk", "/data/app/Term.apk");
 endif;
 if (file_getprop("/tmp/aroma/app_choices.prop", "item.1.3")=="1") then ui_print("Installing SuperSU");
@@ -24,29 +26,37 @@ run_program("/tmp/busybox", "unzip", "-o", "/tmp/supersu/supersu.zip", "-d", "/t
 run_program("/tmp/busybox", "sh", "/tmp/supersu/META-INF/com/google/android/update-binary", "dummy", "1", "/tmp/supersu/supersu.zip");
 endif;
 if (file_getprop("/tmp/aroma/app_choices.prop", "item.1.4")=="1") then ui_print("Installing Busybox");
+run_program("/tmp/busybox", "mount", "/system");
 package_extract_file("tools/busybox", "/system/xbin/busybox");
 set_perm(0, 0, 0771, 0644, "/system/xbin/busybox");
 run_program("/system/xbin/busybox", "--install", "-s", "/system/xbin");
 endif;
 if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.1")=="1") then ui_print("Installing BlueNMEA-2.1.3");
+run_program("/tmp/busybox", "mount", "/data");
 package_extract_file("data/app/BlueNMEA-2.1.3.apk", "/data/app/BlueNMEA-2.1.3.apk");
 endif;
 if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.2")=="1") then ui_print("Installing Drivedroid-0.9.19");
+run_program("/tmp/busybox", "mount", "/data");
 package_extract_file("data/app/Drivedroid-0.9.19.apk", "/data/app/Drivedroid-0.9.19.apk");
 endif;
 if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.3")=="1") then ui_print("Installing Hackerskeyboard-1.0.3.7");
+run_program("/tmp/busybox", "mount", "/data");
 package_extract_file("data/app/Hackerskeyboard-1.0.3.7.apk", "/data/app/Hackerskeyboard-1.0.3.7.apk");
 endif;
 if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.4")=="1") then ui_print("Installing RFAnalyzer");
+run_program("/tmp/busybox", "mount", "/data");
 package_extract_file("data/app/RFAnalyzer.apk", "/data/app/RFAnalyzer.apk");
 endif;
 if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.5")=="1") then ui_print("Installing Shodan");
+run_program("/tmp/busybox", "mount", "/data");
 package_extract_file("data/app/Shodan.apk", "/data/app/Shodan.apk");
 endif;
 if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.6")=="1") then ui_print("Installing USBKeyboard");
+run_program("/tmp/busybox", "mount", "/data");
 package_extract_file("data/app/USBKeyboard.apk", "/data/app/USBKeyboard.apk");
 endif;
 if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.7")=="1") then ui_print("Installing VNC-20110327");
+run_program("/tmp/busybox", "mount", "/data");
 package_extract_file("data/app/VNC-20110327.apk", "/data/app/VNC-20110327.apk");
 endif;
 
@@ -54,12 +64,14 @@ if
    file_getprop("/tmp/aroma/mods.prop","item.0.1") == "1"
      then
    ui_print("@Installing Wireless Firmware");
+   run_program("/tmp/busybox", "mount", "/system");
    package_extract_dir("system/etc/firmware", "/system/etc/firmware");
 endif;
 if
    file_getprop("/tmp/aroma/mods.prop","item.0.2") == "1"
      then
    ui_print("@Installing nano binary");
+   run_program("/tmp/busybox", "mount", "/system");
    package_extract_dir("system/etc/nano", "/system/etc/nano");
    package_extract_dir("system/etc/terminfo", "/system/etc/terminfo");
    package_extract_dir("system/lib", "/system/etc/lib");
@@ -68,13 +80,20 @@ if
    file_getprop("/tmp/aroma/mods.prop","item.0.3") == "1"
      then
    ui_print("@Installing Nethunter wallpapers");
-   run_program("/tmp/busybox", "sh", "wallpaper/setwallpaper.sh");
+   run_program("/tmp/busybox", "mount", "/data");
+   package_extract_dir("wallpaper", "/tmp/wallpaper");
+   set_perm(0, 0, 0755, "/tmp/wallpaper/setwallpaper.sh");
+   run_program("/tmp/wallpaper/setwallpaper.sh");
+   unmount("/data");
 endif;
 if
    file_getprop("/tmp/aroma/mods.prop","item.0.4") == "1"
      then
    ui_print("@Freeing some space on /system");
+   run_program("/tmp/busybox", "mount", "/system");
+   set_perm(0, 0, 0755, "/tmp/cleansystem.sh");
    run_program("/tmp/busybox", "sh", "/tmp/cleansystem.sh");
+   unmount("/system");
 endif;
 
 set_progress(0.8);
@@ -83,9 +102,11 @@ package_extract_dir("anykernelzip", "/tmp/anykernel");
 run_program("/tmp/busybox", "unzip", "-o", "/tmp/anykernel/anykernel2.zip", "-d", "/tmp/anykernel");
 run_program("/tmp/busybox", "sh", "/tmp/anykernel/META-INF/com/google/android/update-binary", "dummy", "1", "/tmp/anykernel/anykernel2.zip");
 
-set_perm_recursive(0, 0, 0771, 0644, "/data/app");
-set_perm_recursive(0, 0, 0775, 0644, "/system/app");
+run_program("/tmp/busybox", "mount", "/data");
+set_perm_recursive(1000, 1000, 0771, 0644, "/data/app");
 set_progress(0.9);
+ui_print("@Wiping dalvik-cache");
+delete_recursive("/data/dalvik-cache");
 unmount("/data");
 unmount("/system");
 ui_print("@Finished Install");
