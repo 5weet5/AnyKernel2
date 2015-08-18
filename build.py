@@ -231,9 +231,10 @@ def main():
 		print('Device ', args.device, 'not found devices.cfg')
 		exit(0)
 
+	# Add developer information to Anykernel2
 	regexanykernel(device)
 
-	# Grab latestest SuperSU
+	# Grab latestest SuperSU and all apps
 	suzipfile = os.path.isfile('supersu/supersu.zip')
 
 	if os.path.isdir('supersu') and not suzipfile:
@@ -242,6 +243,13 @@ def main():
 		os.mkdir('supersu')
 		supersu()
 
+	if os.path.isdir('data/app'):
+		allapps()
+	elif not os.path.isdir('data/app'):
+		os.mkdir('data/app')
+		allapps()
+
+	####### Start AnyKernel2 installer ############
 	# Copy anykernel update-binary to android folder for installation
 	dir = 'META-INF/com/google/android/'
 	if os.path.exists(dir):
@@ -259,15 +267,7 @@ def main():
 
 	####### End AnyKernel2 installer ############
 	
-	####### Start building aroma installer ######
-	if os.path.isdir('data/app'):
-		allapps()
-	elif not os.path.isdir('data/app'):
-		os.mkdir('data/app')
-		allapps()
-
-	dir = 'META-INF/com/google/android/'
-
+	####### Start Aroma installer ######
 	if os.path.exists(dir):
 		shutil.rmtree(dir)
 
