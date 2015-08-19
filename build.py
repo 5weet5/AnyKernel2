@@ -89,13 +89,20 @@ def zip(src, dst, status):
 			shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out',
 																	  'devices.cfg', '.DS_Store', '.git', '.idea', 'aroma-update',
 																	  'aroma', 'data', 'system', 'anykernel', 'wallpaper'
-																	  'supersu', 'supersu', 'wallpaper', '' 'update-nethunter*'))
+																	  'supersu', 'supersu', 'wallpaper', 'uninstaller' 'update-nethunter*'))
 		elif status == "aroma":
 			shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out',
 																	  'devices.cfg', '.DS_Store', '.git', '.idea',
-																	  'modules', 'anykernel.sh', 'dtb',
+																	  'modules', 'anykernel.sh', 'dtb', 'uninstaller',
 																	  'ramdisk', 'patch', 'anykernel',
 																	  'zImage*', 'aroma-update', 'update-nethunter*'))
+		elif status == "uninstaller":
+			shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out', 'tools',
+																	  'devices.cfg', '.DS_Store', '.git', '.idea', 'supersu',
+																	  'modules', 'anykernel.sh', 'dtb', 'uninstaller',
+																	  'ramdisk', 'patch', 'anykernel', 'aroma-update',
+																	  'aroma', 'data', 'system', 'patch', 'ramdisk', 'wallpaper',
+																	  'zImage*', 'aroma-update', 'update-nethunter*'))			
 
 	except OSError as e:
 		if e.errno == errno.ENOTDIR:
@@ -197,7 +204,7 @@ def regexanykernel(device):
 	file_handle.close()
 
 def main():
-	######### Start Anykernel2 installer #############
+	dir = 'META-INF/com/google/android/'
 
 	try:
 		Config = ConfigParser.ConfigParser()
@@ -215,9 +222,21 @@ def main():
 	parser = argparse.ArgumentParser(description='Nethunter zip builder')
 	parser.add_argument('--device', '-d', action='store', help=help_device)
 	parser.add_argument('--forcedown', '-f', action='store_true', help='Force redownloading')
+	parser.add_argument('--uninstaller', '-u', action='store_true', help='Force redownloading')
 
 	args = parser.parse_args()
 
+	######## UNINSTALLER ###########
+	if args.uninstaller:
+		if os.path.exists(dir):
+			shutil.rmtree(dir)
+		shutil.copytree('uninstaller', dir)
+		zipfilename = 'nethunter-uninstaller'
+		zip('tmp_out', zipfilename, 'uninstaller')
+		print('Created uninstaller: ', zipfilename + '.zip')
+		exit(0)
+
+	######## FORCE DOWNLOAD ###########
 	if args.forcedown:
 		supersu()
 		allapps()	
@@ -251,7 +270,6 @@ def main():
 
 	####### Start AnyKernel2 installer ############
 	# Copy anykernel update-binary to android folder for installation
-	dir = 'META-INF/com/google/android/'
 	if os.path.exists(dir):
 		shutil.rmtree(dir)
 	shutil.copytree('anykernel', dir)
