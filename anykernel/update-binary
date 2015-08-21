@@ -72,12 +72,4 @@ fi;
 # We can pass a no-op ":"  in case resize is in a function. (CM12+ adds it inside function)
 /tmp/busybox sed -i 's/resize/:/g' /system/etc/mkshrc
 
-# Cleanup
-if [ "$(file_getprop /tmp/nethunterkernel/anykernel.sh do.cleanup)" == 1 ]; then
-  rm -rf /tmp/nethunterkernel
-  rm -rf /tmp/anykernel
-  rm -rf /tmp/supersu
-  rm -rf /tmp/busybox /tmp/mkbootimg /tmp/unpackbootimg
-fi;
-
 ui_print "- Kernel installation completed";

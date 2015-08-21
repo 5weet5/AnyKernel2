@@ -4,12 +4,13 @@ set_progress(0.1);
 ui_print("Copying tools to /tmp");
 package_extract_dir("tools", "/tmp");
 set_perm(0, 0, 0755, "/tmp/busybox");
-set_progress(0.3);
+set_progress(0.2);
 ui_print("Mounting /data");
 run_program("/tmp/busybox", "mount", "/data");
+set_progress(0.3);
 ui_print("Mounting /system");
 run_program("/tmp/busybox", "mount", "/system");
-set_progress(0.5);
+set_progress(0.4);
 ui_print("@Installing Apps");
 if (file_getprop("/tmp/aroma/app_choices.prop", "item.1.1")=="1") then ui_print("Installing SuperSU");
 package_extract_dir("supersu", "/tmp/supersu");
@@ -53,15 +54,25 @@ run_program("/tmp/busybox", "mount", "/data");
 package_extract_file("data/app/VNC-20110327.apk", "/data/app/VNC-20110327.apk");
 endif;
 
+set_progress(0.5);
 if
    file_getprop("/tmp/aroma/mods.prop","item.0.1") == "1"
+     then
+   ui_print("@Freeing some space on /system");
+   run_program("/tmp/busybox", "mount", "/system");
+   set_perm(0, 0, 0755, "/tmp/cleansystem.sh");
+   run_program("/tmp/busybox", "ash", "/tmp/cleansystem.sh");
+   unmount("/system");
+endif;
+if
+   file_getprop("/tmp/aroma/mods.prop","item.0.2") == "1"
      then
    ui_print("@Installing Wireless Firmware");
    run_program("/tmp/busybox", "mount", "/system");
    package_extract_dir("system/etc/firmware", "/system/etc/firmware");
 endif;
 if
-   file_getprop("/tmp/aroma/mods.prop","item.0.2") == "1"
+   file_getprop("/tmp/aroma/mods.prop","item.0.3") == "1"
      then
    ui_print("@Installing nano binary");
    run_program("/tmp/busybox", "mount", "/system");
@@ -69,7 +80,7 @@ if
    run_program("/tmp/installnano.sh");
 endif;
 if
-   file_getprop("/tmp/aroma/mods.prop","item.0.3") == "1"
+   file_getprop("/tmp/aroma/mods.prop","item.0.4") == "1"
      then
    ui_print("@Installing Nethunter wallpapers");
    run_program("/tmp/busybox", "mount", "/data");
@@ -78,15 +89,13 @@ if
    run_program("/tmp/wallpaper/setwallpaper.sh");
    unmount("/data");
 endif;
-if
-   file_getprop("/tmp/aroma/mods.prop","item.0.4") == "1"
-     then
-   ui_print("@Freeing some space on /system");
-   run_program("/tmp/busybox", "mount", "/system");
-   set_perm(0, 0, 0755, "/tmp/cleansystem.sh");
-   run_program("/tmp/busybox", "ash", "/tmp/cleansystem.sh");
-   unmount("/system");
-endif;
+
+set_progress(0.6);
+ui_print("@Checking for busybox");
+run_program("/tmp/busybox", "mount", "/system");
+package_extract_dir("system/xbin", "/tmp/system/xbin");
+set_perm(0, 0, 0755, "/tmp/busyboxcheck.sh");
+run_program("/tmp/busyboxcheck.sh");
 
 set_progress(0.7);
 ui_print("@Checking for previous versions of Nethunter");
@@ -105,6 +114,6 @@ run_program("/tmp/busybox", "unzip", "-o", "/tmp/anykernel/anykernel2.zip", "-d"
 run_program("/tmp/busybox", "ash", "/tmp/anykernel/META-INF/com/google/android/update-binary", "dummy", "1", "/tmp/anykernel/anykernel2.zip");
 unmount("/data");
 unmount("/system");
-delete_recursive("/tmp");
+#delete_recursive("/tmp");
 ui_print("@Finished Install");
 set_progress(1);

@@ -8,6 +8,7 @@ NANOBIN=/system/xbin/nano
 
 # Check for previous installation of nano
 if [ ! -d "$NANODIR" ] || [ ! -f "$NANOBIN"] ; then
+	echo "@Installing nano"
 	cp -rf system/etc/nano /system/etc/nano
 	cp -rf system/etc/terminfo /system/etc/terminfo
 	cp -f system/etc/xbin/nano /system/xbin/nano
