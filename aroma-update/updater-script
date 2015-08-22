@@ -35,7 +35,7 @@ package_extract_file("data/app/Drivedroid-0.9.19.apk", "/data/app/Drivedroid-0.9
 endif;
 if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.3")=="1") then ui_print("Installing Hackerskeyboard-1.0.3.7");
 run_program("/tmp/busybox", "mount", "/data");
-package_extract_file("data/app/Hackerskeyboard-1.0.3.7.apk", "/data/app/Hackerskeyboard-1.0.3.7.apk");
+package_extract_file("data/app/Hackerskeyboard-1.38.2.apk", "/data/app/Hackerskeyboard-1.38.2.apk");
 endif;
 if (file_getprop("/tmp/aroma/app_choices.prop", "item.2.4")=="1") then ui_print("Installing RFAnalyzer");
 run_program("/tmp/busybox", "mount", "/data");
@@ -93,7 +93,6 @@ endif;
 set_progress(0.6);
 ui_print("@Checking for busybox");
 run_program("/tmp/busybox", "mount", "/system");
-package_extract_dir("system/xbin", "/tmp/system/xbin");
 set_perm(0, 0, 0755, "/tmp/busyboxcheck.sh");
 run_program("/tmp/busyboxcheck.sh");
 
