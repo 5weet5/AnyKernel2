@@ -128,7 +128,7 @@ if prop("menu.prop","selected")=="1" then
     "Installation Completed",
     "<#080>Congratulations...</#>\n\n"+
     "Nethunter has been installed sucessfully!\n\n"+
-    "Please reboot!",
+    "Please reboot! If you are unable to exit with exit button, press power and hit exit.",
     "@info"
   );
   #-- Back to Menu
