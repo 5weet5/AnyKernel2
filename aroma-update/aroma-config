@@ -128,7 +128,7 @@ if prop("menu.prop","selected")=="1" then
     "Installation Completed",
     "<#080>Congratulations...</#>\n\n"+
     "Nethunter has been installed sucessfully!\n\n"+
-    "Please reboot! If you are unable to exit with exit button, press power and hit exit.",
+    "Please reboot! If you are unable to exit with exit button, press power and hit 'Quit Installation'.",
     "@info"
   );
   #-- Back to Menu
@@ -145,6 +145,8 @@ if prop("menu.prop","selected")=="2" then
     "Nethunter Changelog",
     #-- Subtitle
     "Lastest changes", "",
+    #-- Icon
+    "@update",
     #-- Text
     resread("changelog.txt"),
     #-- Custom OK Button Text (Optional)
