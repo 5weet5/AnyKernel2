@@ -1,35 +1,34 @@
 AnyKernel 2.0 was written by osm0sis and this fork was heavily modified by Binkybear for building with Nethunter.
 
 This will generate an installer for Nethunter that can be flashed in TWRP.
-
-## Instructions
+# Instructions
 
 Example building for the Nexus 5 (hammerhead):
-```bash
+```sh
 python build.py -d hammerhead --lollipop
 ```
 Building an installer without aroma:
-```bash
+```sh
 python build.py -d hammerhead --lollipop --noaroma
 ```
 Building the kernel only (useful for testing if kernel works):
-```bash
+```sh
 python build.py -d hammerhead --marshmallow -k
 ```
 Force download all third party apps:
-```bash
+```sh
 python build.py --forcedownload
 ```
 Building the uninstaller:
-```bash
+```sh
 python build.py --uninstaller
 ```
-Help:
+Show help:
 ```bash
 python build.py -h
 ```
 
-## How to add a new/unsupported device
+# How to add a new/unsupported device
 
 There are really two/three components here:
 
@@ -39,7 +38,7 @@ There are really two/three components here:
 
 All devices are contained in devices.cfg.  If you want to add your own device you would add something like:
 
-```bash
+```sh
 # Device Model for reference
 [codename]
 devicenames = codename codename2_if_it_has_one
