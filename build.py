@@ -86,18 +86,18 @@ def zip(src, dst, status):
     try:
         pwd = os.path.dirname(os.path.realpath(__file__))
         if status == "anykernel":
-            shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out',
+            shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out', 'kernels',
                                                                       'devices.cfg', '.DS_Store', '.git', '.idea', 'aroma-update',
                                                                       'aroma', 'data', 'system', 'anykernel', 'wallpaper', 'noaroma-update',
                                                                       'supersu', 'supersu', 'wallpaper', 'uninstaller' 'update-nethunter*'))
         elif status == "aroma":
-            shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out',
+            shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out', 'kernels',
                                                                       'devices.cfg', '.DS_Store', '.git', '.idea',
                                                                       'modules', 'anykernel.sh', 'dtb', 'uninstaller',
                                                                       'ramdisk', 'patch', 'anykernel', 'noaroma-update',
                                                                       'zImage*', 'aroma-update', 'update-nethunter*'))
         elif status == "uninstaller":
-            shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out', 'tools',
+            shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out', 'tools', 'kernels',
                                                                       'devices.cfg', '.DS_Store', '.git', '.idea', 'supersu',
                                                                       'modules', 'anykernel.sh', 'dtb', 'uninstaller',
                                                                       'ramdisk', 'patch', 'anykernel', 'aroma-update', 'noaroma-update',
@@ -205,6 +205,12 @@ def regexanykernel(device):
 
 def main():
     dir = 'META-INF/com/google/android/'
+    i = datetime.datetime.now()
+    current_time = "%s%s%s_%s%s%s" % (i.day, i.month, i.year, i.hour, i.minute, i.second)
+
+    # Remove any existing zImage
+    if os.path.exists('zImage'):
+        os.remove('zImage')
 
     try:
         Config = ConfigParser.ConfigParser()
@@ -221,11 +227,79 @@ def main():
 
     parser = argparse.ArgumentParser(description='Nethunter zip builder')
     parser.add_argument('--device', '-d', action='store', help=help_device)
+    parser.add_argument('--kitkat', '-kk', action='store_true', help='Android.4.4.4')
+    parser.add_argument('--lollipop', '-l', action='store_true', help='Android 5')
+    parser.add_argument('--marshmallow', '-m', action='store_true', help='Android 6')
     parser.add_argument('--forcedown', '-f', action='store_true', help='Force redownloading')
-    parser.add_argument('--noaroma', '-n', action='store_true', help='Force use of no AROMA')
-    parser.add_argument('--uninstaller', '-u', action='store_true', help='Force redownloading')
+    parser.add_argument('--noaroma', '-n', action='store_true', help='Use a generic updater-script instead of Aroma')
+    parser.add_argument('--uninstaller', '-u', action='store_true', help='Create an uninstaller')
+    parser.add_argument('--kernel', '-k', action='store_true', help='Build kernel only')
 
     args = parser.parse_args()
+
+    aroma_enabled = Config.get(args.device, 'aroma')
+
+    # If aroma is not compatible with device, then exit and suggest --noaroma
+    if args.noaroma and not aroma_enabled:
+        print('Aroma installer does not currently work with %s' % args.device)
+        exit(0)
+
+    # Check to make sure we didn't go crazy selecting version numbers
+    if args.kitkat or args.lollipop or args.marshmallow:
+        version_picked = True
+        i = 0
+        check = [args.kitkat, args.lollipop, args.marshmallow]
+        for version in check:
+            if version:
+                i += 1
+        if i > 1:
+            print('Select only one version: --kitkat, --lollipop, --marshmallow')
+            exit(0)
+    elif args.uninstaller:
+        pass
+    else:
+        print('Select a version: --kitkat, --lollipop, --marshmallow')
+        exit(0)
+
+    ####### BUILD DEVICE CONFIG #######
+    if args.device in devicenames:
+        device = args.device
+        # Add developer information to Anykernel2
+        regexanykernel(device)
+    elif not args.device:
+        print('No arguments supplied.  Try -h or --help')
+        exit(0)
+    else:
+        print('Device %s not found devices.cfg' % args.device)
+        exit(0)
+
+    # Device and version set, lets copy kernel!  Probably could replace with function but eh.
+    if device and args.kitkat or args.lollipop or args.marshmallow:
+        if args.kitkat:
+            version = "kitkat"
+        elif args.lollipop:
+            version = "lollipop"
+        elif args.marshmallow:
+            version = "marshmallow"
+
+        # Check to see if an sepolicy exists in ramdisk, remove if it does
+        if os.path.exists('ramdisk/sepolicy'):
+            os.remove('ramdisk/sepolicy')
+
+        # Marshmallow requires a modified sepolicy to work with SuperSU
+        if version is 'marshmallow':
+            sepolicy_location = 'kernels/marshmallow/' + device + '/sepolicy'
+            if os.path.exists(sepolicy_location):
+                shutil.copy2(sepolicy_location, 'ramdisk/sepolicy')
+            else:
+                print('SEPOLICY not found at: %s' % sepolicy_location)
+                exit(0)
+        kernel_location = 'kernels/' + version + '/' + device + '/zImage'
+        if os.path.exists(kernel_location):
+            shutil.copy2(kernel_location, 'zImage')
+        else:
+            print('Kernel not found at: %s' % kernel_location)
+            exit(0)
 
     ######## UNINSTALLER ###########
     if args.uninstaller:
@@ -241,18 +315,6 @@ def main():
     if args.forcedown:
         supersu()
         allapps()
-
-    if args.device in devicenames:
-        device = args.device
-    elif not args.device:
-        print('No arguments supplied.  Try -h or --help')
-        exit(0)
-    else:
-        print('Device ', args.device, 'not found devices.cfg')
-        exit(0)
-
-    # Add developer information to Anykernel2
-    regexanykernel(device)
 
     # Grab latestest SuperSU and all apps
     suzipfile = os.path.isfile('supersu/supersu.zip')
@@ -271,18 +333,33 @@ def main():
 
     ####### Start AnyKernel2 installer ############
     # Copy anykernel update-binary to android folder for installation
+    zipfilename = 'anykernel2'
+
     if os.path.exists(dir):
         shutil.rmtree(dir)
     shutil.copytree('anykernel', dir)
-
-    zipfilename = 'anykernel2'
 
     # Finished--copy files to tmp folder and zip
     zip('tmp_out', zipfilename, 'anykernel')
     if os.path.exists('anykernelzip'):
         shutil.rmtree('anykernelzip')
-    os.makedirs('anykernelzip')
-    shutil.move('anykernel2.zip', 'anykernelzip/anykernel2.zip')
+
+
+    ######## IF KERNEL ONLY ###########
+    if args.kernel and args.device and version_picked:
+        kernelzip = 'kernel-nethunter-' + device + '-' + version + '-' + str(current_time) + '.zip'
+        shutil.move('anykernel2.zip', kernelzip)  # Create kernel only here!
+        exit(0)
+    elif args.kernel and not version_picked:
+        print('Select a version: --kitkat, --lollipop, --marshmallow')
+        exit(0)
+    elif args.kernel and not device:
+        print('Missing device name!  Please use --device or -d')
+        exit(0)
+    else:
+        os.makedirs('anykernelzip')
+        shutil.move('anykernel2.zip', 'anykernelzip/anykernel2.zip')  # Continue with build!
+
     ####### End AnyKernel2 installer ############
 
     ####### Start No-Aroma Installer ############
@@ -299,10 +376,8 @@ def main():
         regexaroma(device) # Add version/author to Aroma installer
     ###### End Aroma installer #########
 
-    # Format for zip file is update-nethunter-devicename-DDMMYY_HHMMSS.zip
-    i = datetime.datetime.now()
-    current_time = "%s%s%s_%s%s%s" % (i.day, i.month, i.year, i.hour, i.minute, i.second)
-    zipfilename = 'update-nethunter-' + device + '-' + str(current_time)
+    # Format for zip file is update-nethunter-devicename-version-DDMMYY_HHMMSS.zip
+    zipfilename = 'update-nethunter-' + device + '-' + version + '-' + str(current_time)
 
     zip('tmp_out', zipfilename, 'aroma')
 
