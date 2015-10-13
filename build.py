@@ -86,7 +86,7 @@ def zip(src, dst, status):
     try:
         pwd = os.path.dirname(os.path.realpath(__file__))
         if status == "anykernel":
-            shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out', 'kernels',
+            shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out', 'kernels', 'files',
                                                                       'devices.cfg', '.DS_Store', '.git', '.idea', 'aroma-update',
                                                                       'aroma', 'data', 'system', 'anykernel', 'wallpaper', 'noaroma-update',
                                                                       'supersu', 'supersu', 'wallpaper', 'uninstaller' 'update-nethunter*'))
@@ -99,7 +99,7 @@ def zip(src, dst, status):
         elif status == "uninstaller":
             shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out', 'tools', 'kernels',
                                                                       'devices.cfg', '.DS_Store', '.git', '.idea', 'supersu',
-                                                                      'modules', 'anykernel.sh', 'dtb', 'uninstaller',
+                                                                      'modules', 'anykernel.sh', 'dtb', 'uninstaller', 'files',
                                                                       'ramdisk', 'patch', 'anykernel', 'aroma-update', 'noaroma-update',
                                                                       'aroma', 'data', 'system', 'patch', 'ramdisk', 'wallpaper',
                                                                       'zImage*', 'aroma-update', 'update-nethunter*'))
@@ -237,7 +237,9 @@ def main():
 
     args = parser.parse_args()
 
-    aroma_enabled = Config.get(args.device, 'aroma')
+    # Check if device supports aroma in config file
+    if args.device:
+        aroma_enabled = Config.get(args.device, 'aroma')
 
     # If aroma is not compatible with device, then exit and suggest --noaroma
     if args.noaroma and not aroma_enabled:
