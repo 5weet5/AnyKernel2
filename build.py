@@ -87,18 +87,18 @@ def zip(src, dst, status):
         pwd = os.path.dirname(os.path.realpath(__file__))
         if status == "anykernel":
             shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out', 'kernels', 'files',
-                                                                      'devices.cfg', '.DS_Store', '.git', '.idea', 'aroma-update',
+                                                                      'devices.cfg', '.DS_Store', '.git', '.idea', 'aroma-update', 'kernel-nethunter*',
                                                                       'aroma', 'data', 'system', 'anykernel', 'wallpaper', 'noaroma-update',
-                                                                      'supersu', 'supersu', 'wallpaper', 'uninstaller' 'update-nethunter*'))
+                                                                      'supersu', 'supersu', 'wallpaper', 'uninstaller', 'update-nethunter*'))
         elif status == "aroma":
             shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out', 'kernels',
-                                                                      'devices.cfg', '.DS_Store', '.git', '.idea',
+                                                                      'devices.cfg', '.DS_Store', '.git', '.idea', 'kernel-nethunter*',
                                                                       'modules', 'anykernel.sh', 'dtb', 'uninstaller',
                                                                       'ramdisk', 'patch', 'anykernel', 'noaroma-update',
                                                                       'zImage*', 'aroma-update', 'update-nethunter*'))
         elif status == "uninstaller":
             shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out', 'tools', 'kernels',
-                                                                      'devices.cfg', '.DS_Store', '.git', '.idea', 'supersu',
+                                                                      'devices.cfg', '.DS_Store', '.git', '.idea', 'supersu', 'kernel-nethunter*',
                                                                       'modules', 'anykernel.sh', 'dtb', 'uninstaller', 'files',
                                                                       'ramdisk', 'patch', 'anykernel', 'aroma-update', 'noaroma-update',
                                                                       'aroma', 'data', 'system', 'patch', 'ramdisk', 'wallpaper',
@@ -239,10 +239,11 @@ def main():
 
     # Check if device supports aroma in config file
     if args.device:
-        aroma_enabled = Config.get(args.device, 'aroma')
+        aroma_enabled = bool(Config.get(args.device, 'aroma'))
+    print('DEBUG: aroma_enabled= %s' % aroma_enabled)
 
     # If aroma is not compatible with device, then exit and suggest --noaroma
-    if args.noaroma and not aroma_enabled:
+    if not aroma_enabled and not args.noaroma:
         print('Aroma installer does not currently work with %s' % args.device)
         exit(0)
 
