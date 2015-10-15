@@ -25,20 +25,20 @@ file_getprop() { grep "^$2" "$1" | cut -d= -f2; }
 getprop() { test -e /sbin/getprop && /sbin/getprop $1 || file_getprop /default.prop $1; }
 abort() { ui_print "$*"; exit 1; }
 
-mkdir -p /tmp/nethunterkernel;
-cd /tmp/nethunterkernel;
+mkdir -p /tmp/anykernel;
+cd /tmp/anykernel;
 unzip -o "$ZIP";
 
 ui_print "**********************";
-ui_print "$(file_getprop /tmp/nethunterkernel/anykernel.sh kernel.string)";
+ui_print "$(file_getprop /tmp/anykernel/anykernel.sh kernel.string)";
 ui_print " AnyKernel2 by osm0sis @ xda-developers";
 ui_print "**********************";
-/tmp/busybox mount /system;
+/sbin/busybox mount /system;
 
-if [ "$(file_getprop /tmp/nethunterkernel/anykernel.sh do.devicecheck)" == 1 ]; then
+if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.devicecheck)" == 1 ]; then
   ui_print "- Checking device...";
   for i in 1 2 3 4 5; do
-    testname="$(file_getprop /tmp/nethunterkernel/anykernel.sh device.name$i)";
+    testname="$(file_getprop /tmp/anykernel/anykernel.sh device.name$i)";
     if [ "$(getprop ro.product.device)" == "$testname" -o "$(getprop ro.build.product)" == "$testname" ]; then
       match=1;
     fi;
@@ -49,27 +49,23 @@ if [ "$(file_getprop /tmp/nethunterkernel/anykernel.sh do.devicecheck)" == 1 ]; 
   fi;
 fi;
 
-if [ "$(file_getprop /tmp/nethunterkernel/anykernel.sh do.initd)" == 1 ]; then
+if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.initd)" == 1 ]; then
   ui_print "- Creating init.d...";
   mkdir /system/etc/init.d;
   set_perm_recursive 0 0 0755 0755 /system/etc/init.d;
 fi;
 
 ui_print "- Starting kernel installation...";
-/sbin/sh /tmp/nethunterkernel/anykernel.sh;
-if [ "$(cat /tmp/nethunterkernel/exitcode)" == 1 ]; then 
+/sbin/sh /tmp/anykernel/anykernel.sh;
+if [ "$(cat /tmp/anykernel/exitcode)" == 1 ]; then 
   umount /system;
   abort;
 fi;
 
-if [ "$(file_getprop /tmp/nethunterkernel/anykernel.sh do.modules)" == 1 ]; then
+if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.modules)" == 1 ]; then
   ui_print "- Pushing modules...";
-  cp -f /tmp/nethunterkernel/modules/* /system/lib/modules/;
+  cp -f /tmp/anykernel/modules/* /system/lib/modules/;
   set_perm_recursive 0 0 0755 0644 /system/lib/modules;
 fi;
-
-# [Nethunter] Fix for Cyanogenmod jackpal terminal launching
-# We can pass a no-op ":"  in case resize is in a function. (CM12+ adds it inside function)
-/tmp/busybox sed -i 's/resize/:/g' /system/etc/mkshrc
 
 ui_print "- Kernel installation completed";

@@ -289,6 +289,10 @@ def main():
         if os.path.exists('ramdisk/sepolicy'):
             os.remove('ramdisk/sepolicy')
 
+        # Check to see if an dtb image exists, remove if it does
+        if os.path.exists('dtb'):
+            os.remove('dtb')
+
         # Marshmallow requires a modified sepolicy to work with SuperSU
         if version is 'marshmallow':
             sepolicy_location = 'kernels/marshmallow/' + device + '/sepolicy'
@@ -297,12 +301,19 @@ def main():
             else:
                 print('SEPOLICY not found at: %s' % sepolicy_location)
                 exit(0)
+
+        # Copy kernel from version/device to root folder
         kernel_location = 'kernels/' + version + '/' + device + '/zImage'
         if os.path.exists(kernel_location):
             shutil.copy2(kernel_location, 'zImage')
         else:
             print('Kernel not found at: %s' % kernel_location)
             exit(0)
+
+        # Copy dt.img if it exists
+        dtb_location = 'kernels/' + version + '/' + device + '/dtb'
+        if os.path.exists(dtb_location):
+            shutil.copy2(dtb_location, 'dtb')
 
     ######## UNINSTALLER ###########
     if args.uninstaller:
@@ -335,7 +346,6 @@ def main():
         allapps()
 
     ####### Start AnyKernel2 installer ############
-    # Copy anykernel update-binary to android folder for installation
     zipfilename = 'anykernel2'
 
     if os.path.exists(dir):
@@ -347,10 +357,12 @@ def main():
     if os.path.exists('anykernelzip'):
         shutil.rmtree('anykernelzip')
 
+    ####### End AnyKernel2 installer ############
 
-    ######## IF KERNEL ONLY ###########
+    ######## KERNEL ONLY ###########
+    kernelzip = 'kernel-nethunter-' + device + '-' + version + '-' + str(current_time) + '.zip'
+
     if args.kernel and args.device and version_picked:
-        kernelzip = 'kernel-nethunter-' + device + '-' + version + '-' + str(current_time) + '.zip'
         shutil.move('anykernel2.zip', kernelzip)  # Create kernel only here!
         exit(0)
     elif args.kernel and not version_picked:
@@ -363,7 +375,6 @@ def main():
         os.makedirs('anykernelzip')
         shutil.move('anykernel2.zip', 'anykernelzip/anykernel2.zip')  # Continue with build!
 
-    ####### End AnyKernel2 installer ############
 
     ####### Start No-Aroma Installer ############
     if args.noaroma:
