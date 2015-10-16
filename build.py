@@ -310,10 +310,12 @@ def main():
             print('Kernel not found at: %s' % kernel_location)
             exit(0)
 
-        # Copy dt.img if it exists
-        dtb_location = 'kernels/' + version + '/' + device + '/dtb'
+        # Copy dtb.img if it exists
+        dtb_location = 'kernels/' + version + '/' + device + '/dtb.img'
         if os.path.exists(dtb_location):
+            print('DTB found at: %s' % dtb_location)
             shutil.copy2(dtb_location, 'dtb')
+
 
     ######## UNINSTALLER ###########
     if args.uninstaller:
