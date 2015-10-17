@@ -293,6 +293,11 @@ def main():
         if os.path.exists('dtb'):
             os.remove('dtb')
 
+        # Check for existing modules (ko files), remove to make way for new modules
+        module_list = [f for f in os.listdir("modules") if f.endswith(".ko")]
+        for f in module_list:
+            os.remove(f)
+
         # Marshmallow requires a modified sepolicy to work with SuperSU
         if version is 'marshmallow':
             sepolicy_location = 'kernels/marshmallow/' + device + '/sepolicy'
@@ -309,6 +314,14 @@ def main():
         else:
             print('Kernel not found at: %s' % kernel_location)
             exit(0)
+
+        # Copy modules if it exists
+        module_location = 'kernels/' + version + '/' + device + '/modules'
+        if os.path.exists(module_location):
+            module_list = [f for f in os.listdir(module_location) if f.endswith(".ko")]
+            for f in module_list:
+                file = module_location + '/' + f
+                shutil.copy2(file, 'modules/' + f)
 
         # Copy dtb.img if it exists
         dtb_location = 'kernels/' + version + '/' + device + '/dtb.img'
