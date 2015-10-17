@@ -296,7 +296,7 @@ def main():
         # Check for existing modules (ko files), remove to make way for new modules
         module_list = [f for f in os.listdir("modules") if f.endswith(".ko")]
         for f in module_list:
-            os.remove(f)
+            os.remove('modules/' + f)
 
         # Marshmallow requires a modified sepolicy to work with SuperSU
         if version is 'marshmallow':
