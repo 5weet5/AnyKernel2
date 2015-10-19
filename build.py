@@ -414,7 +414,7 @@ def main():
     if os.path.exists('anykernelzip'):
         shutil.rmtree('anykernelzip')
 
-    print('Created: ', zipfilename + '.zip')
+    print('Created: %s.zip' % zipfilename)
 
 if __name__ == "__main__":
     main()
