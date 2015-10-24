@@ -212,6 +212,7 @@ def main():
     if os.path.exists('zImage'):
         os.remove('zImage')
 
+    # Read devices.cfg, get device names
     try:
         Config = ConfigParser.ConfigParser()
         Config.read('devices.cfg')
@@ -239,12 +240,14 @@ def main():
 
     # Check if device supports aroma in config file
     if args.device:
-        aroma_enabled = bool(Config.get(args.device, 'aroma'))
-    print('DEBUG: aroma_enabled= %s' % aroma_enabled)
+        aroma_enabled = Config.get(args.device, 'aroma')
+        if aroma_enabled == "True":
+            aroma_enabled = True
+        else:
+            aroma_enabled = False
 
-    # If aroma is not compatible with device, then exit and suggest --noaroma
     if not aroma_enabled and not args.noaroma:
-        print('Aroma installer does not currently work with %s' % args.device)
+        print('Aroma installer does not currently work with device: %s.\nRun with -n or --noaroma' % args.device)
         exit(0)
 
     # Check to make sure we didn't go crazy selecting version numbers
