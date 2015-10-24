@@ -64,7 +64,7 @@ def allapps():
             if not os.path.isfile(apkname): # Check for existing apk download
                 print('Downloading ' + value + 'to' + apkname)
                 urllib.urlretrieve (value, apkname)
-        print('Finished downloading all apps')
+                print('Finished downloading all apps')
 
     except urllib.URLError, e:
         print('URLError = ' + str(e.reason))
@@ -246,9 +246,10 @@ def main():
         else:
             aroma_enabled = False
 
-    if not aroma_enabled and not args.noaroma:
-        print('Aroma installer does not currently work with device: %s.\nRun with -n or --noaroma' % args.device)
-        exit(0)
+    if not aroma_enabled and not args.noaroma and not args.kernel:
+        #print('Aroma installer does not currently work with device: %s.\nRun with -n or --noaroma' % args.device)
+        print('Automatically setting to noaroma!')
+        args.noaroma = True
 
     # Check to make sure we didn't go crazy selecting version numbers
     if args.kitkat or args.lollipop or args.marshmallow:
@@ -382,6 +383,7 @@ def main():
 
     if args.kernel and args.device and version_picked:
         shutil.move('anykernel2.zip', kernelzip)  # Create kernel only here!
+        print('Created: %s.zip' % kernelzip)
         exit(0)
     elif args.kernel and not version_picked:
         print('Select a version: --kitkat, --lollipop, --marshmallow')
