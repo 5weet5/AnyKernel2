@@ -332,6 +332,14 @@ def main():
             print('Kernel not found at: %s' % kernel_location)
             exit(0)
 
+        # Copy any init.d scripts
+        initd_location = 'kernels/' + version + '/' + device + '/init.d'
+        if os.path.exists(initd_location):
+            initd_list = [f for f in os.listdir(initd_location) if f.endswith(".sh")]
+            for f in initd_list:
+                file = initd_location + '/' + f
+                shutil.copy2(file, 'system/etc/init.d/' + f)
+
         # Copy modules if it exists
         module_location = 'kernels/' + version + '/' + device + '/modules'
         if os.path.exists(module_location):
@@ -443,6 +451,11 @@ def main():
     if firmware_list:
         for f in firmware_list:
             os.remove('system/etc/firmware/' + f)
+
+    # Remove any init.d files
+    if initd_list:
+        for f in initd_list:
+            os.remove('system/etc/init.d/' + f)
 
     # Clean!
     cleanup()
