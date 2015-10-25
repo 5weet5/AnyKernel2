@@ -203,14 +203,35 @@ def regexanykernel(device):
     file_handle.write(file_string)
     file_handle.close()
 
+
+def cleanup():
+    # Remove any existing zImage
+    if os.path.exists('zImage'):
+        print('Removing previous zImage')
+        os.remove('zImage')
+
+    # Clean up
+    if os.path.exists('anykernelzip'):
+        shutil.rmtree('anykernelzip')
+
+    # Check to see if an sepolicy exists in ramdisk, remove if it does
+    if os.path.exists('ramdisk/sepolicy'):
+        print('Removing previous sepolicy')
+        os.remove('ramdisk/sepolicy')
+
+    # Check to see if an dtb image exists, remove if it does
+    if os.path.exists('dtb'):
+        print('Removing previous dtb')
+        os.remove('dtb')
+
+
 def main():
     dir = 'META-INF/com/google/android/'
     i = datetime.datetime.now()
     current_time = "%s%s%s_%s%s%s" % (i.day, i.month, i.year, i.hour, i.minute, i.second)
 
-    # Remove any existing zImage
-    if os.path.exists('zImage'):
-        os.remove('zImage')
+    # Remove any existing builds that might be left
+    cleanup()
 
     # Read devices.cfg, get device names
     try:
@@ -289,14 +310,6 @@ def main():
         elif args.marshmallow:
             version = "marshmallow"
 
-        # Check to see if an sepolicy exists in ramdisk, remove if it does
-        if os.path.exists('ramdisk/sepolicy'):
-            os.remove('ramdisk/sepolicy')
-
-        # Check to see if an dtb image exists, remove if it does
-        if os.path.exists('dtb'):
-            os.remove('dtb')
-
         # Check for existing modules (ko files), remove to make way for new modules
         module_list = [f for f in os.listdir("modules") if f.endswith(".ko")]
         for f in module_list:
@@ -326,6 +339,15 @@ def main():
             for f in module_list:
                 file = module_location + '/' + f
                 shutil.copy2(file, 'modules/' + f)
+
+        # Copy device specific firmware
+        firmware_location = 'kernels/' + version + '/' + device + '/firmware'
+        if os.path.exists(firmware_location):
+            firmware_list = [f for f in os.listdir(firmware_location) if f.endswith(".bin" or ".fw")]
+            for f in firmware_list:
+                file = firmware_location + '/' + f
+                print('Found firmware: %s' % file)
+                shutil.copy2(file, 'system/etc/firmware/' + f)
 
         # Copy dtb.img if it exists
         dtb_location = 'kernels/' + version + '/' + device + '/dtb.img'
@@ -415,11 +437,15 @@ def main():
 
     zip('tmp_out', zipfilename, 'aroma')
 
-    # Clean up
-    if os.path.exists('anykernelzip'):
-        shutil.rmtree('anykernelzip')
-
     print('Created: %s.zip' % zipfilename)
+
+    # Remove device specific firmware that may have been copied over.
+    if firmware_list:
+        for f in firmware_list:
+            os.remove('system/etc/firmware/' + f)
+
+    # Clean!
+    cleanup()
 
 if __name__ == "__main__":
     main()
