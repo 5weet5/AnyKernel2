@@ -57,7 +57,7 @@ set_perm(0, 0, 0755, "/tmp/cleansystem.sh");
 run_program("/sbin/busybox", "ash", "/tmp/cleansystem.sh");
 
 # Firmware takes up to much space on system so we symlink it
-ui_print("@Symlink firmware from /data/local/nhsystem to /system/etc/firmware");
+ui_print("@Symlink firmware from /data/local/nhsystem/firmware to /system/etc/firmware");
 set_perm(0, 0, 0755, "/tmp/symlinkfirmware.sh");
 run_program("/sbin/busybox", "ash", "/tmp/symlinkfirmware.sh");
 
@@ -77,10 +77,9 @@ if [ "$(cat /tmp/anykernel/exitcode)" == 1 ]; then
 fi;
 
 if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.modules)" == 1 ]; then
-  ui_print "- Pushing modules...";
-  mkdir -p /system/lib/modules/;
-  cp -f /tmp/anykernel/modules/* /system/lib/modules/;
-  set_perm_recursive 0 0 0755 0644 /system/lib/modules;
+  ui_print("@Symlink modules from /data/local/nhsystem/modules to /system/lib/modules");
+  set_perm(0, 0, 0755, "/tmp/symlinkmodules.sh");
+  run_program("/sbin/busybox", "ash", "/tmp/symlinkmodules.sh");
 fi;
 
 ui_print "- Kernel installation completed";
