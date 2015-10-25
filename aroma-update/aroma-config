@@ -109,8 +109,6 @@ if prop("menu.prop","selected")=="1" then
 
   checkbox(
     "System Settings","<b>Personalize</b>","@personalize","mods.prop",
-    "Try to free space on /system", "Remove some large GAPPS",1,
-    "Install Additional Wireless firmware", "Necessary for external wifi (requires OTG)",1,
     "Install Nano binary", "If your ROM does not include nano",0,
     "Install Kali Nethunter Wallpaper", "",1
   );

@@ -43,9 +43,6 @@ ui_print("@Freeing some space on /system");
 set_perm(0, 0, 0755, "/tmp/cleansystem.sh");
 run_program("/tmp/busybox", "ash", "/tmp/cleansystem.sh");
 
-ui_print("@Installing Wireless Firmware");
-package_extract_dir("system/etc/firmware", "/system/etc/firmware");
-
 ui_print("@Installing nano binary");
 set_perm(0, 0, 0755, "/tmp/installnano.sh");
 run_program("/tmp/installnano.sh");

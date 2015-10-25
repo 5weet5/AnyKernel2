@@ -50,9 +50,16 @@ if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.devicecheck)" == 1 ]; then
 fi;
 
 # Free up space for kernel only install (otherwise nothing installs!)
+# It actually runs twice because sometimes it's installed when kernel
+# is by itself and other times Aroma/noaroma installs re
 ui_print("@Freeing some space on /system");
 set_perm(0, 0, 0755, "/tmp/cleansystem.sh");
-run_program("/tmp/busybox", "ash", "/tmp/cleansystem.sh");
+run_program("/sbin/busybox", "ash", "/tmp/cleansystem.sh");
+
+# Firmware takes up to much space on system so we symlink it
+ui_print("@Symlink firmware from /data/local/nhsystem to /system/etc/firmware");
+set_perm(0, 0, 0755, "/tmp/symlinkfirmware.sh");
+run_program("/sbin/busybox", "ash", "/tmp/symlinkfirmware.sh");
 
 if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.initd)" == 1 ]; then
   ui_print "- Creating init.d...";
