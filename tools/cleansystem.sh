@@ -29,3 +29,11 @@ rm -rf $SA/BasicDreams
 rm -rf $SA/Drive
 rm -rf $SA/Maps
 rm -rf $SA/FaceLock
+rm -rf $SA/Books
+rm -rf $SA/Newsstand
+rm -rf $SA/Street
+rm -rf $SA/CloudPrint2
+rm -rf $SA/PlayGames
+rm -rf $SA/YouTube
+rm -rf $SA/PlusOne
+rm -rf $SA/PrintSpooler
