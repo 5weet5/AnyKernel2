@@ -88,7 +88,7 @@ def zip(src, dst, status):
         if status == "anykernel":
             shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out', 'kernels', 'files',
                                                                       'devices.cfg', '.DS_Store', '.git', '.idea', 'aroma-update', 'kernel-nethunter*',
-                                                                      'aroma', 'data', 'system', 'anykernel', 'wallpaper', 'noaroma-update',
+                                                                      'aroma', 'data', 'anykernel', 'wallpaper', 'noaroma-update',
                                                                       'supersu', 'supersu', 'wallpaper', 'uninstaller', 'update-nethunter*'))
         elif status == "aroma":
             shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out', 'kernels',
@@ -335,7 +335,7 @@ def main():
         # Copy any init.d scripts
         initd_location = 'kernels/' + version + '/' + device + '/init.d'
         if os.path.exists(initd_location):
-            initd_list = [f for f in os.listdir(initd_location) if f.endswith(".sh")]
+            initd_list = [f for f in os.listdir(initd_location)]
             for f in initd_list:
                 file = initd_location + '/' + f
                 shutil.copy2(file, 'system/etc/init.d/' + f)

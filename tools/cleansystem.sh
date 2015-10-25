@@ -3,6 +3,8 @@
 # clean the system from extra/uneeded apps
 #
 SA=/system/app
+
+# Apks were located in /system/app folder previously
 rm -f $SA/PrintSpooler.*
 rm -f $SA/QuickOffice.apk
 rm -f $SA/CloudPrint2.apk
@@ -20,3 +22,10 @@ rm -f $SA/Currents.apk
 rm -f $SA/GoogleEars.apk
 rm -f $SA/Keep.apk
 rm -f $SA/FaceLock.apk
+
+# Apks are located in folders now
+rm -rf $SA/HoloSpiralWallpaper
+rm -rf $SA/BasicDreams
+rm -rf $SA/Drive
+rm -rf $SA/Maps
+rm -rf $SA/FaceLock
