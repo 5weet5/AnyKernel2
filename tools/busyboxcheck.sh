@@ -10,5 +10,7 @@ if [ ! -f /system/xbin/busybox ] || [ ! -f /system/bin/busybox ]; then
 	mkdir -p /data/local/nhsystem/bin/
 	cp /tmp/busybox /data/local/nhsystem/bin/busybox
 	chmod 755 /data/local/nhsystem/bin/busybox
+	ln -s /data/local/nhsystem/bin/busybox /system/bin/busybox
+	ln -s /data/local/nhsystem/bin/busybox /system/xbin/busybox	
 	/data/local/nhsystem/bin/busybox --install -s /system/xbin
 fi
