@@ -311,7 +311,7 @@ def main():
             version = "marshmallow"
 
         # Check for existing modules (ko files), remove to make way for new modules
-        module_list = [f for f in os.listdir("modules") if f.endswith(".ko")]
+        module_list = [f for f in os.listdir("system/lib/modules") if f.endswith(".ko")]
         for f in module_list:
             os.remove('system/lib/modules/' + f)
 
