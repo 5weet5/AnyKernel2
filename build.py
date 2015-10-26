@@ -86,9 +86,9 @@ def zip(src, dst, status):
     try:
         pwd = os.path.dirname(os.path.realpath(__file__))
         if status == "anykernel":
-            shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out', 'kernels', 'files',
+            shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out', 'kernels', 'files', 'xbin',
                                                                       'devices.cfg', '.DS_Store', '.git', '.idea', 'aroma-update', 'kernel-nethunter*',
-                                                                      'aroma', 'data', 'anykernel', 'wallpaper', 'noaroma-update',
+                                                                      'aroma', 'data', 'anykernel', 'wallpaper', 'noaroma-update', 'nano', 'terminfo',
                                                                       'supersu', 'supersu', 'wallpaper', 'uninstaller', 'update-nethunter*'))
         elif status == "aroma":
             shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out', 'kernels',
@@ -313,7 +313,7 @@ def main():
         # Check for existing modules (ko files), remove to make way for new modules
         module_list = [f for f in os.listdir("modules") if f.endswith(".ko")]
         for f in module_list:
-            os.remove('modules/' + f)
+            os.remove('system/lib/modules/' + f)
 
         # Marshmallow requires a modified sepolicy to work with SuperSU
         if version is 'marshmallow':
@@ -346,7 +346,7 @@ def main():
             module_list = [f for f in os.listdir(module_location) if f.endswith(".ko")]
             for f in module_list:
                 file = module_location + '/' + f
-                shutil.copy2(file, 'modules/' + f)
+                shutil.copy2(file, 'system/lib/modules/' + f)
 
         # Copy device specific firmware
         firmware_location = 'kernels/' + version + '/' + device + '/firmware'

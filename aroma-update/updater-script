@@ -92,7 +92,6 @@ run_program("/tmp/busyboxcheck.sh");
 
 ui_print("@Symlink bootkali");
 symlink("/data/data/com.offsec.nethunter/files/scripts/bootkali", "/system/bin/bootkali");
-set_perm(0, 0, 0755, "/system/bin/bootkali");
 
 set_progress(0.7);
 ui_print("@Checking for previous versions of Nethunter");
