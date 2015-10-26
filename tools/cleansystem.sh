@@ -37,3 +37,11 @@ rm -rf $SA/PlayGames
 rm -rf $SA/YouTube
 rm -rf $SA/PlusOne
 rm -rf $SA/PrintSpooler
+rm -rf $SA/GoogleHindiIME
+rm -rf $SA/GooglePinyinIME
+rm -rf $SA/KoreanIME
+rm -rf $SA/LatinImeGoogle
+rm -rf $SA/iWnnIME
+rm -rf $SA/Photos
+rm -rf /system/priv-app/Hangouts
+rm -rf /system/priv-app/Wallet
