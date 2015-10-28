@@ -259,18 +259,26 @@ def main():
 
     args = parser.parse_args()
 
+    ######## FORCE DOWNLOAD ###########
+    if args.forcedown:
+        supersu()
+        allapps()
+
+    # Grab latestest SuperSU and all apps
+    suzipfile = os.path.isfile('supersu/supersu.zip')
+
     # Check if device supports aroma in config file
     if args.device:
         aroma_enabled = Config.get(args.device, 'aroma')
+        # Check for aroma
         if aroma_enabled == "True":
             aroma_enabled = True
         else:
             aroma_enabled = False
-
-    if not aroma_enabled and not args.noaroma and not args.kernel:
-        #print('Aroma installer does not currently work with device: %s.\nRun with -n or --noaroma' % args.device)
-        print('Automatically setting to noaroma!')
-        args.noaroma = True
+        # If Aroma set to false the set noaroma argument
+        if not aroma_enabled and not args.noaroma and not args.kernel:
+            print('Automatically setting to noaroma!')
+            args.noaroma = True
 
     # Check to make sure we didn't go crazy selecting version numbers
     if args.kitkat or args.lollipop or args.marshmallow:
@@ -284,6 +292,8 @@ def main():
             print('Select only one version: --kitkat, --lollipop, --marshmallow')
             exit(0)
     elif args.uninstaller:
+        pass
+    elif args.forcedown:
         pass
     else:
         print('Select a version: --kitkat, --lollipop, --marshmallow')
@@ -311,7 +321,7 @@ def main():
             version = "marshmallow"
 
         # Check for existing modules (ko files), remove to make way for new modules
-        module_list = [f for f in os.listdir("system/lib/modules") if f.endswith(".ko")]
+        module_list = [f for f in os.listdir("system/lib/modules") if f.endswith(".ko" or ".so")]
         for f in module_list:
             os.remove('system/lib/modules/' + f)
 
@@ -373,14 +383,6 @@ def main():
         zip('tmp_out', zipfilename, 'uninstaller')
         print('Created uninstaller: ', zipfilename + '.zip')
         exit(0)
-
-    ######## FORCE DOWNLOAD ###########
-    if args.forcedown:
-        supersu()
-        allapps()
-
-    # Grab latestest SuperSU and all apps
-    suzipfile = os.path.isfile('supersu/supersu.zip')
 
     if os.path.isdir('supersu') and not suzipfile:
         supersu()
