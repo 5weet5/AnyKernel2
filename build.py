@@ -86,18 +86,18 @@ def zip(src, dst, status):
     try:
         pwd = os.path.dirname(os.path.realpath(__file__))
         if status == "anykernel":
-            shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out', 'kernels', 'files', 'xbin',
+            shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README*', 'placeholder','tmp_out', 'kernels', 'files', 'xbin',
                                                                       'devices.cfg', '.DS_Store', '.git', '.idea', 'aroma-update', 'kernel-nethunter*',
                                                                       'aroma', 'data', 'anykernel', 'wallpaper', 'noaroma-update', 'nano', 'terminfo',
                                                                       'supersu', 'supersu', 'wallpaper', 'uninstaller', 'update-nethunter*'))
         elif status == "aroma":
-            shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out', 'kernels',
+            shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README*', 'placeholder','tmp_out', 'kernels',
                                                                       'devices.cfg', '.DS_Store', '.git', '.idea', 'kernel-nethunter*',
                                                                       'modules', 'anykernel.sh', 'dtb', 'uninstaller',
                                                                       'ramdisk', 'patch', 'anykernel', 'noaroma-update',
                                                                       'zImage*', 'aroma-update', 'update-nethunter*'))
         elif status == "uninstaller":
-            shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README', 'placeholder','tmp_out', 'tools', 'kernels',
+            shutil.copytree(pwd, 'tmp_out', ignore=shutil.ignore_patterns('*.py', 'README*', 'placeholder','tmp_out', 'tools', 'kernels',
                                                                       'devices.cfg', '.DS_Store', '.git', '.idea', 'supersu', 'kernel-nethunter*',
                                                                       'modules', 'anykernel.sh', 'dtb', 'uninstaller', 'files',
                                                                       'ramdisk', 'patch', 'anykernel', 'aroma-update', 'noaroma-update',
@@ -321,7 +321,7 @@ def main():
             version = "marshmallow"
 
         # Check for existing modules (ko files), remove to make way for new modules
-        module_list = [f for f in os.listdir("system/lib/modules") if f.endswith(".ko" or ".so")]
+        module_list = [f for f in os.listdir("system/lib/modules")]
         for f in module_list:
             os.remove('system/lib/modules/' + f)
 
@@ -353,7 +353,7 @@ def main():
         # Copy modules if it exists
         module_location = 'kernels/' + version + '/' + device + '/modules'
         if os.path.exists(module_location):
-            module_list = [f for f in os.listdir(module_location) if f.endswith(".ko")]
+            module_list = [f for f in os.listdir(module_location)]
             for f in module_list:
                 file = module_location + '/' + f
                 shutil.copy2(file, 'system/lib/modules/' + f)
